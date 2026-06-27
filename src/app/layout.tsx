@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Onest, Unbounded } from 'next/font/google'
 import './globals.css'
 import { Providers } from './provider'
+import { Header, Footer } from '@/common/components'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/common/constants/seo.constants'
 
 const onest = Onest({
@@ -27,8 +28,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang='uk' className={`${onest.variable} ${unbounded.variable}`}>
-			<body className='min-h-screen antialiased' suppressHydrationWarning>
-				<Providers>{children}</Providers>
+			<body className='flex min-h-screen flex-col antialiased' suppressHydrationWarning>
+				<Providers>
+					<Header />
+					<div className='flex-1'>{children}</div>
+					<Footer />
+				</Providers>
 			</body>
 		</html>
 	)
