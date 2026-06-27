@@ -1,0 +1,21 @@
+export const UI_ROUTES = {
+	HOME: '/',
+	SHOP: '/shop',
+	CATEGORY: (model: string) => `/category/${model}`,
+	SUBCATEGORY: (model: string, system: string) => `/category/${model}/${system}`,
+	PRODUCT: (slug: string) => `/product/${slug}`,
+	SEARCH: '/search',
+	CART: '/cart',
+	CHECKOUT: '/checkout',
+	ACCOUNT: '/account',
+	ACCOUNT_ORDERS: '/account/orders',
+	LOGIN: '/auth/login',
+	REGISTER: '/auth/register',
+	BLOG: '/blog',
+	ABOUT: '/about',
+	CONTACTS: '/contacts',
+	DELIVERY: '/delivery',
+	RETURNS: '/returns',
+	PRIVACY: '/privacy',
+	OFFER: '/offer'
+} as const

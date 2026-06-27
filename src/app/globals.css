@@ -1,26 +1,77 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Дизайн-токени Tesla Lviv — Golden Amber + холодний сірий.
+ * Джерело: tesla-meta/docs/design-principles.md §2.1
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--radius: 0.75rem;
+
+	--background: #f7f8fa; /* n-50 */
+	--foreground: #13171b; /* n-900 */
+	--card: #ffffff;
+	--card-foreground: #13171b;
+	--muted: #eef0f3; /* n-100 */
+	--muted-foreground: #6b7480; /* n-500 */
+	--border: #dfe3e8; /* n-200 */
+	--input: #dfe3e8;
+
+	--primary: #f59e0b; /* amber-500 */
+	--primary-foreground: #231300; /* темний текст на бурштині */
+	--accent-text: #b45309; /* amber-700 — посилання на світлій */
+	--ring: #f59e0b;
+
+	--success: #16a34a;
+	--destructive: #dc2626;
+}
+
+.dark {
+	--background: #0c0f12; /* n-950 */
+	--foreground: #f7f8fa;
+	--card: #13171b; /* n-900 */
+	--card-foreground: #f7f8fa;
+	--muted: #20262c; /* n-800 */
+	--muted-foreground: #9aa3ad; /* n-400 */
+	--border: #333a42; /* n-700 */
+	--input: #333a42;
+
+	--primary: #f59e0b;
+	--primary-foreground: #231300;
+	--accent-text: #fbbf24; /* amber-400 на темній */
+	--ring: #fbbf24;
+
+	--success: #22c55e;
+	--destructive: #f87171;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-accent-text: var(--accent-text);
+	--color-ring: var(--ring);
+	--color-success: var(--success);
+	--color-destructive: var(--destructive);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 0.25rem);
+
+	--font-sans: var(--font-onest);
+	--font-display: var(--font-unbounded);
+	--font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: var(--font-onest), system-ui, sans-serif;
 }
