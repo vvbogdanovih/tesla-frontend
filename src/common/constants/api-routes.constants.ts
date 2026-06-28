@@ -24,9 +24,9 @@ export const API_URLS = {
 	CARS: {
 		BASE: `/cars`
 	},
-	SYSTEMS: {
-		BASE: `/systems`,
-		PRODUCTS: (slug: string) => `/systems/${slug}/products`
+	CATEGORIES: {
+		BASE: `/categories`,
+		PRODUCTS: (slug: string) => `/categories/${slug}/products`
 	},
 	CART: {
 		BASE: `/cart`

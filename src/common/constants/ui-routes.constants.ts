@@ -2,7 +2,7 @@ export const UI_ROUTES = {
 	HOME: '/',
 	SHOP: '/shop',
 	CATEGORY: (model: string) => `/category/${model}`,
-	SUBCATEGORY: (model: string, system: string) => `/category/${model}/${system}`,
+	SUBCATEGORY: (model: string, category: string) => `/category/${model}/${category}`,
 	PRODUCT: (slug: string) => `/product/${slug}`,
 	SEARCH: '/search',
 	CART: '/cart',
