@@ -33,15 +33,21 @@ export default async function Home() {
 							'radial-gradient(900px 520px at 84% -12%, rgba(245,158,11,.46), transparent 60%)'
 					}}
 				/>
-				<div
+				<video
 					aria-hidden
-					className='pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[66%] bg-cover bg-right bg-no-repeat md:block'
+					autoPlay
+					muted
+					loop
+					playsInline
+					poster='/hero.jpg'
+					className='pointer-events-none absolute inset-y-0 right-0 z-0 hidden h-full w-[66%] object-cover object-right md:block'
 					style={{
-						backgroundImage: "url('/hero.jpg')",
 						WebkitMaskImage: 'linear-gradient(90deg,transparent 0%,#000 42%,#000 100%)',
 						maskImage: 'linear-gradient(90deg,transparent 0%,#000 42%,#000 100%)'
 					}}
-				/>
+				>
+					<source src='/hero.mp4' type='video/mp4' />
+				</video>
 				<div
 					aria-hidden
 					className='pointer-events-none absolute inset-0 z-0'
