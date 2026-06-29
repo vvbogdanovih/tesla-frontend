@@ -15,18 +15,21 @@ export const API_URLS = {
 		ADDRESSES: `/account/addresses`,
 		ORDERS: `/account/orders`
 	},
-	PRODUCTS: {
-		BASE: `/products`,
-		SEARCH: `/products/search`,
-		BY_SLUG: (slug: string) => `/products/by-slug/${slug}`,
-		BY_ID: (id: string) => `/products/${id}`
+	// Публічний каталог
+	CATALOG: {
+		PRODUCTS: `/catalog/products`,
+		BY_SLUG: (slug: string) => `/catalog/products/${slug}`,
+		SEARCH: `/catalog/search`
 	},
 	CARS: {
 		BASE: `/cars`
 	},
 	CATEGORIES: {
-		BASE: `/categories`,
-		PRODUCTS: (slug: string) => `/categories/${slug}/products`
+		BASE: `/categories`
+	},
+	CONTENT_BLOCKS: {
+		BASE: `/content-blocks`,
+		BY_KEY: (key: string) => `/content-blocks/${key}`
 	},
 	CART: {
 		BASE: `/cart`

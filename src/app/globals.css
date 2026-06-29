@@ -75,3 +75,45 @@ body {
 	color: var(--foreground);
 	font-family: var(--font-onest), system-ui, sans-serif;
 }
+
+/* Rich text (опис товару, тексти сайту) */
+.rich {
+	line-height: 1.7;
+}
+.rich h2 {
+	font-size: 1.25rem;
+	font-weight: 700;
+	margin: 1.25rem 0 0.5rem;
+}
+.rich h3 {
+	font-size: 1.1rem;
+	font-weight: 600;
+	margin: 1rem 0 0.5rem;
+}
+.rich p {
+	margin: 0.5rem 0;
+}
+.rich ul,
+.rich ol {
+	margin: 0.5rem 0;
+	padding-left: 1.25rem;
+}
+.rich ul {
+	list-style: disc;
+}
+.rich ol {
+	list-style: decimal;
+}
+.rich li {
+	margin: 0.25rem 0;
+}
+.rich a {
+	color: var(--accent-text);
+	text-decoration: underline;
+}
+.rich blockquote {
+	border-left: 3px solid var(--border);
+	padding-left: 1rem;
+	color: var(--muted-foreground);
+	margin: 0.75rem 0;
+}

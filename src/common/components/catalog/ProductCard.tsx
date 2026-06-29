@@ -1,0 +1,72 @@
+import Link from 'next/link'
+import Image from 'next/image'
+import { ImageOff } from 'lucide-react'
+import { UI_ROUTES } from '@/common/constants'
+import { CONDITION_LABEL, TYPE_LABEL, discountPercent, formatMoney } from '@/common/utils/format'
+import type { CatalogProduct } from '@/common/types'
+
+export const ProductCard = ({ product: p }: { product: CatalogProduct }) => {
+	const img = p.images[0]
+	const discount = p.onSale ? discountPercent(p.price, p.oldPrice) : null
+	const inStock = p.stockQty > 0
+
+	return (
+		<Link
+			href={UI_ROUTES.PRODUCT(p.slug)}
+			className='group border-border bg-card flex flex-col overflow-hidden rounded-2xl border transition-shadow hover:shadow-lg'
+		>
+			<div className='bg-muted relative aspect-square w-full overflow-hidden'>
+				{img ? (
+					<Image
+						src={img.url}
+						alt={img.alt ?? p.name}
+						fill
+						sizes='(max-width:640px) 50vw, (max-width:1024px) 33vw, 300px'
+						className='object-cover transition-transform duration-300 group-hover:scale-105'
+					/>
+				) : (
+					<ImageOff className='text-muted-foreground absolute inset-0 m-auto h-8 w-8' />
+				)}
+				{discount && (
+					<span className='bg-primary text-primary-foreground absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-xs font-bold'>
+						−{discount}%
+					</span>
+				)}
+			</div>
+
+			<div className='flex flex-1 flex-col p-4'>
+				<div className='mb-2 flex flex-wrap gap-1.5'>
+					<Badge>{TYPE_LABEL[p.type]}</Badge>
+					{p.condition !== 'new' && <Badge>{CONDITION_LABEL[p.condition]}</Badge>}
+					{!inStock && <Badge muted>Під замовлення</Badge>}
+				</div>
+
+				<h3 className='group-hover:text-accent-text line-clamp-2 text-sm font-semibold transition-colors'>
+					{p.name}
+				</h3>
+				<p className='text-muted-foreground mt-1 font-mono text-xs'>{p.sku}</p>
+
+				<div className='mt-auto flex items-baseline gap-2 pt-3'>
+					<span className='text-lg font-bold'>{formatMoney(p.price)}</span>
+					{p.onSale && p.oldPrice && (
+						<span className='text-muted-foreground text-sm line-through'>
+							{formatMoney(p.oldPrice)}
+						</span>
+					)}
+				</div>
+			</div>
+		</Link>
+	)
+}
+
+const Badge = ({ children, muted }: { children: React.ReactNode; muted?: boolean }) => (
+	<span
+		className={
+			muted
+				? 'bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[11px] font-medium'
+				: 'border-border text-muted-foreground rounded-full border px-2 py-0.5 text-[11px] font-medium'
+		}
+	>
+		{children}
+	</span>
+)

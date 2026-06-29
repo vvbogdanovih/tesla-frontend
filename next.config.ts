@@ -8,10 +8,9 @@ const nextConfig: NextConfig = {
 		// навантажувати VPS. Hostname онови під реальний бакет.
 		unoptimized: true,
 		remotePatterns: [
-			{
-				protocol: 'https',
-				hostname: '*.amazonaws.com'
-			}
+			{ protocol: 'https', hostname: '*.amazonaws.com' },
+			{ protocol: 'https', hostname: '*.r2.dev' },
+			{ protocol: 'https', hostname: '*.r2.cloudflarestorage.com' }
 		]
 	},
 	async headers() {
