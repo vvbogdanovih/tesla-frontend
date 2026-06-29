@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type PropsWithChildren, useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from '@/common/store/useAuthStore'
-import { FullScreenLoader } from '@/common/components'
 
 export const Providers = ({ children }: PropsWithChildren) => {
 	const [client] = useState(
@@ -13,19 +12,16 @@ export const Providers = ({ children }: PropsWithChildren) => {
 				defaultOptions: { queries: { refetchOnWindowFocus: false } }
 			})
 	)
-	const [ready, setReady] = useState(false)
 
+	// Авторизація — у фоні; публічний контент рендериться одразу (SSR/SEO).
 	useEffect(() => {
-		useAuthStore
-			.getState()
-			.checkAuth()
-			.finally(() => setReady(true))
+		useAuthStore.getState().checkAuth()
 	}, [])
 
 	return (
 		<QueryClientProvider client={client}>
-			<Toaster position='top-right' />
-			{ready ? children : <FullScreenLoader />}
+			<Toaster position='top-center' />
+			{children}
 		</QueryClientProvider>
 	)
 }

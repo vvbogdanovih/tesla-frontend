@@ -28,11 +28,19 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang='uk' className={`${onest.variable} ${unbounded.variable}`}>
-			<body className='flex min-h-screen flex-col antialiased' suppressHydrationWarning>
+			<body className='antialiased' suppressHydrationWarning>
+				{/* Лого Tesla у фоні (×3 від адмінки) */}
+				<div
+					aria-hidden
+					className='pointer-events-none fixed inset-0 z-0 bg-center bg-no-repeat opacity-[0.05]'
+					style={{ backgroundImage: "url('/tesla.svg')", backgroundSize: 'min(2100px, 165vw)' }}
+				/>
 				<Providers>
-					<Header />
-					<div className='flex-1'>{children}</div>
-					<Footer />
+					<div className='relative z-10 flex min-h-screen flex-col'>
+						<Header />
+						<div className='flex-1'>{children}</div>
+						<Footer />
+					</div>
 				</Providers>
 			</body>
 		</html>

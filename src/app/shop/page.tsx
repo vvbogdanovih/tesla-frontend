@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 }
 
 const FILTER_KEYS = [
+	'q',
 	'category',
 	'car',
 	'type',
@@ -44,9 +45,13 @@ export default async function ShopPage({
 	const from = data.total === 0 ? 0 : (data.page - 1) * data.limit + 1
 	const to = Math.min(data.page * data.limit, data.total)
 
+	const query = params.get('q')
+
 	return (
 		<div className='mx-auto max-w-[1240px] px-6 py-10'>
-			<h1 className='font-display mb-1 text-3xl font-medium tracking-tight'>Каталог запчастин</h1>
+			<h1 className='font-display mb-1 text-3xl font-medium tracking-tight'>
+				{query ? `Результати за «${query}»` : 'Каталог запчастин'}
+			</h1>
 			<p className='text-muted-foreground mb-8 text-sm'>
 				Показано {from}–{to} із {data.total}
 			</p>

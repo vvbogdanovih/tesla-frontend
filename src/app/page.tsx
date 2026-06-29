@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { ArrowRight, Car as CarIcon, Search, ShieldCheck, Truck, Package } from 'lucide-react'
 import { catalogApi } from '@/common/services/catalog.api'
 import { ProductCard } from '@/common/components/catalog/ProductCard'
+import { SearchBox } from '@/common/components/layout/SearchBox'
 import { UI_ROUTES } from '@/common/constants'
 import type { Car } from '@/common/types'
 
@@ -61,13 +62,9 @@ export default async function Home() {
 						Понад 1000 оригінальних та аналогових запчастин для Model 3 · Y · S · X.
 					</p>
 
-					<Link
-						href={UI_ROUTES.SEARCH}
-						className='mb-7 flex max-w-xl items-center gap-2.5 rounded-2xl border border-white/15 bg-white/[0.07] px-5 py-4 text-sm text-zinc-300 backdrop-blur'
-					>
-						<Search className='h-4 w-4' /> Введи назву або артикул&nbsp;
-						<span className='text-zinc-500'>напр. 1645989-00-A</span>
-					</Link>
+					<div className='mb-7'>
+						<SearchBox transparent large className='relative w-full max-w-xl' />
+					</div>
 
 					<div className='mb-10 flex flex-wrap gap-3'>
 						<Link
