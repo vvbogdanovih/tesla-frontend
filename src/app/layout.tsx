@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Onest, Unbounded } from 'next/font/google'
 import './globals.css'
 import { Providers } from './provider'
-import { Header, Footer } from '@/common/components'
+import { Header, Footer, CartDrawer } from '@/common/components'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/common/constants/seo.constants'
 
 const onest = Onest({
@@ -41,6 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 						<div className='flex-1'>{children}</div>
 						<Footer />
 					</div>
+					<CartDrawer />
 				</Providers>
 			</body>
 		</html>

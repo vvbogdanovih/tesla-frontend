@@ -4,6 +4,7 @@ import { ArrowRight, Car as CarIcon, Search, ShieldCheck, Truck, Package } from 
 import { catalogApi } from '@/common/services/catalog.api'
 import { ProductCard } from '@/common/components/catalog/ProductCard'
 import { SearchBox } from '@/common/components/layout/SearchBox'
+import { LeadButton } from '@/common/components/catalog/LeadButton'
 import { UI_ROUTES } from '@/common/constants'
 import type { Car } from '@/common/types'
 
@@ -191,12 +192,12 @@ export default async function Home() {
 					<p className='max-w-xl text-zinc-400'>
 						Залиште заявку з кодом або VIN — підберемо запчастину та повідомимо ціну.
 					</p>
-					<Link
-						href={UI_ROUTES.CONTACTS}
+					<LeadButton
+						type='fitment'
+						label='Залишити заявку'
+						title='Підбір деталі'
 						className='bg-primary text-primary-foreground flex h-12 items-center rounded-xl px-7 text-sm font-bold transition-transform hover:-translate-y-0.5'
-					>
-						Залишити заявку
-					</Link>
+					/>
 				</div>
 			</section>
 		</>

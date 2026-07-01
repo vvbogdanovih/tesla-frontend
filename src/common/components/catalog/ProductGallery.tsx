@@ -5,7 +5,15 @@ import Image from 'next/image'
 import { ImageOff } from 'lucide-react'
 import type { CatalogImage } from '@/common/types'
 
-export const ProductGallery = ({ images, name }: { images: CatalogImage[]; name: string }) => {
+export const ProductGallery = ({
+	images,
+	name,
+	badges
+}: {
+	images: CatalogImage[]
+	name: string
+	badges?: React.ReactNode
+}) => {
 	const [active, setActive] = useState(0)
 
 	if (!images.length) {
@@ -20,13 +28,16 @@ export const ProductGallery = ({ images, name }: { images: CatalogImage[]; name:
 
 	return (
 		<div className='flex flex-col gap-3'>
-			<div className='bg-muted relative aspect-square w-full overflow-hidden rounded-2xl'>
+			<div className='bg-white shadow-2xl relative aspect-square w-full overflow-hidden rounded-2xl'>
+				{badges && (
+					<div className='absolute left-3.5 top-3.5 z-10 flex flex-wrap gap-1.5'>{badges}</div>
+				)}
 				<Image
 					src={main.url}
 					alt={main.alt ?? name}
 					fill
 					sizes='(max-width:1024px) 100vw, 600px'
-					className='object-cover'
+					className='object-contain p-2 sm:p-4'
 					priority
 				/>
 			</div>
@@ -47,7 +58,7 @@ export const ProductGallery = ({ images, name }: { images: CatalogImage[]; name:
 								alt={img.alt ?? `${name} ${i + 1}`}
 								fill
 								sizes='64px'
-								className='object-cover'
+								className='object-contain p-1'
 							/>
 						</button>
 					))}

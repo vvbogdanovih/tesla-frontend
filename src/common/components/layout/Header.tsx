@@ -5,12 +5,16 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ShoppingCart, Heart } from 'lucide-react'
 import { UI_ROUTES } from '@/common/constants/ui-routes.constants'
+import { useCartCount, useCartStore } from '@/common/store/useCartStore'
 import { SearchBox } from './SearchBox'
 
 export const Header = () => {
 	const pathname = usePathname()
 	const isHome = pathname === '/'
 	const [scrolled, setScrolled] = useState(false)
+	const count = useCartCount()
+	const hydrated = useCartStore(s => s.hasHydrated)
+	const openCart = useCartStore(s => s.open)
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 20)
@@ -46,9 +50,19 @@ export const Header = () => {
 						<Link href={UI_ROUTES.ACCOUNT} aria-label='Кабінет'>
 							<Heart className='h-5 w-5' />
 						</Link>
-						<Link href={UI_ROUTES.CART} aria-label='Кошик'>
+						<button
+							type='button'
+							onClick={openCart}
+							aria-label='Кошик'
+							className='relative cursor-pointer'
+						>
 							<ShoppingCart className='h-5 w-5' />
-						</Link>
+							{hydrated && count > 0 && (
+								<span className='bg-primary text-primary-foreground absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold leading-none'>
+									{count}
+								</span>
+							)}
+						</button>
 					</div>
 				</div>
 			</header>
