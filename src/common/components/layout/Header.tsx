@@ -3,10 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ShoppingCart, Heart } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import { UI_ROUTES } from '@/common/constants/ui-routes.constants'
 import { useCartCount, useCartStore } from '@/common/store/useCartStore'
+import { WishlistHeart } from '@/common/components/auth/WishlistHeart'
+import { AuthButton } from '@/common/components/auth/AuthButton'
 import { SearchBox } from './SearchBox'
+import { ThemeToggle } from './ThemeToggle'
 
 export const Header = () => {
 	const pathname = usePathname()
@@ -42,14 +45,15 @@ export const Header = () => {
 					</Link>
 					<nav className='hidden gap-4 text-sm font-medium md:flex'>
 						<Link href={UI_ROUTES.SHOP}>Магазин</Link>
+						<Link href={UI_ROUTES.PRICE_SHEET}>Прайс-лист</Link>
 						<Link href={UI_ROUTES.ABOUT}>Про нас</Link>
 						<Link href={UI_ROUTES.CONTACTS}>Контакти</Link>
 					</nav>
 					<SearchBox transparent={transparent} />
 					<div className='flex items-center gap-3'>
-						<Link href={UI_ROUTES.ACCOUNT} aria-label='Кабінет'>
-							<Heart className='h-5 w-5' />
-						</Link>
+						<ThemeToggle />
+						<AuthButton />
+						<WishlistHeart />
 						<button
 							type='button'
 							onClick={openCart}

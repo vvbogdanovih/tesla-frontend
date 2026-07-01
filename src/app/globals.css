@@ -76,6 +76,19 @@ body {
 	font-family: var(--font-onest), system-ui, sans-serif;
 }
 
+/* Chrome/WebKit autofill: прибираємо світло-синій фон автозаповнення (особливо помітно в темній темі).
+   Inset-shadow перефарбовує фон у токен теми, text-fill — колір тексту; авто-адаптація світла/темна. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	-webkit-text-fill-color: var(--foreground);
+	-webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+	box-shadow: 0 0 0 1000px var(--background) inset;
+	caret-color: var(--foreground);
+	transition: background-color 9999s ease-in-out 0s;
+}
+
 /* Rich text (опис товару, тексти сайту) */
 .rich {
 	line-height: 1.7;

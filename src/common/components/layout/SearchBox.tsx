@@ -101,7 +101,7 @@ export const SearchBox = ({
 			</form>
 
 			{open && term.length >= 2 && (
-				<div className='border-border bg-card absolute top-full right-0 left-0 z-30 mt-2 overflow-hidden rounded-xl border shadow-xl'>
+				<div className='border-border bg-card text-foreground absolute top-full right-0 left-0 z-30 mt-2 overflow-hidden rounded-xl border shadow-xl'>
 					{items.length === 0 ? (
 						<div className='text-muted-foreground p-4 text-sm'>
 							{loading ? 'Пошук…' : 'Нічого не знайдено'}

@@ -6,7 +6,15 @@ import type { Car, Category } from '@/common/types'
 
 type Option = { v: string; l: string }
 
-export const CatalogFilters = ({ categories, cars }: { categories: Category[]; cars: Car[] }) => {
+export const CatalogFilters = ({
+	categories,
+	cars,
+	basePath = '/shop'
+}: {
+	categories: Category[]
+	cars: Car[]
+	basePath?: string
+}) => {
 	const router = useRouter()
 	const sp = useSearchParams()
 
@@ -15,7 +23,7 @@ export const CatalogFilters = ({ categories, cars }: { categories: Category[]; c
 		if (value) params.set(key, value)
 		else params.delete(key)
 		params.delete('page') // фільтр змінився — на першу сторінку
-		router.push(`/shop?${params.toString()}`)
+		router.push(`${basePath}?${params.toString()}`)
 	}
 
 	const carLabel = (c: Car) => (c.generation ? `${c.model} · ${c.generation}` : c.model)

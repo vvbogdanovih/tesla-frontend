@@ -6,18 +6,15 @@ import { CreditCard, ShieldCheck } from 'lucide-react'
 import { catalogApi } from '@/common/services/catalog.api'
 import { Accordion } from '@/common/components/catalog/Accordion'
 import { ProductGallery } from '@/common/components/catalog/ProductGallery'
+import { LivePhotos } from '@/common/components/catalog/LivePhotos'
 import { ProductCard } from '@/common/components/catalog/ProductCard'
 import { LeadButton } from '@/common/components/catalog/LeadButton'
 import { AddToCart } from '@/common/components/catalog/AddToCart'
+import { WishlistButton } from '@/common/components/catalog/WishlistButton'
 import { CopySku } from '@/common/components/catalog/CopySku'
 import { SITE_URL, UI_ROUTES } from '@/common/constants'
 import type { CatalogProduct } from '@/common/types'
-import {
-	CONDITION_LABEL,
-	TYPE_LABEL,
-	discountPercent,
-	formatMoney
-} from '@/common/utils/format'
+import { CONDITION_LABEL, TYPE_LABEL, discountPercent, formatMoney } from '@/common/utils/format'
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -88,15 +85,13 @@ export default async function ProductPage({ params }: Params) {
 		'@type': 'Product',
 		name: p.name,
 		sku: p.sku,
-		image: p.images.map(i => i.url),
+		image: [...p.images, ...(p.livePhotos ?? [])].map(i => i.url),
 		category: p.category?.name,
 		offers: {
 			'@type': 'Offer',
 			price: Number(p.price),
 			priceCurrency: 'UAH',
-			availability: inStock
-				? 'https://schema.org/InStock'
-				: 'https://schema.org/OutOfStock',
+			availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
 			url: productUrl
 		}
 	}
@@ -106,10 +101,13 @@ export default async function ProductPage({ params }: Params) {
 		'@type': 'BreadcrumbList',
 		itemListElement: [
 			{ '@type': 'ListItem', position: 1, name: 'Головна', item: SITE_URL },
-			{ '@type': 'ListItem', position: 2, name: 'Каталог', item: `${SITE_URL}${UI_ROUTES.SHOP}` },
-			...(p.category
-				? [{ '@type': 'ListItem', position: 3, name: p.category.name }]
-				: []),
+			{
+				'@type': 'ListItem',
+				position: 2,
+				name: 'Каталог',
+				item: `${SITE_URL}${UI_ROUTES.SHOP}`
+			},
+			...(p.category ? [{ '@type': 'ListItem', position: 3, name: p.category.name }] : []),
 			{ '@type': 'ListItem', position: p.category ? 4 : 3, name: p.name, item: productUrl }
 		]
 	}
@@ -156,6 +154,9 @@ export default async function ProductPage({ params }: Params) {
 				<div className='min-w-0'>
 					<ProductGallery images={p.images} name={p.name} badges={galleryBadges} />
 
+					{/* Живі фото — реальні знімки екземпляра (перед описом; лише за наявності) */}
+					<LivePhotos photos={p.livePhotos ?? []} productName={p.name} />
+
 					<div className='border-border bg-card mt-10 flex flex-col gap-9 rounded-2xl border p-6 sm:p-8'>
 						{p.descriptionHtml && (
 							<section>
@@ -177,7 +178,9 @@ export default async function ProductPage({ params }: Params) {
 												<td className='text-muted-foreground w-60 py-3 pr-4 align-top text-sm'>
 													{k}
 												</td>
-												<td className={`py-3 text-sm font-semibold ${mono ? 'font-mono' : ''}`}>
+												<td
+													className={`py-3 text-sm font-semibold ${mono ? 'font-mono' : ''}`}
+												>
 													{v}
 												</td>
 											</tr>
@@ -192,10 +195,17 @@ export default async function ProductPage({ params }: Params) {
 								<h2 className='mb-3.5 text-xl font-bold'>Гарантія та доставка</h2>
 								<div className='border-border divide-border divide-y overflow-hidden rounded-xl border'>
 									{warranty?.bodyHtml && (
-										<Accordion title={warranty.title} html={warranty.bodyHtml} defaultOpen />
+										<Accordion
+											title={warranty.title}
+											html={warranty.bodyHtml}
+											defaultOpen
+										/>
 									)}
 									{delivery?.bodyHtml && (
-										<Accordion title={delivery.title} html={delivery.bodyHtml} />
+										<Accordion
+											title={delivery.title}
+											html={delivery.bodyHtml}
+										/>
 									)}
 								</div>
 							</section>
@@ -224,7 +234,10 @@ export default async function ProductPage({ params }: Params) {
 							<>
 								<span className='opacity-50'>·</span>
 								<span>
-									Категорія: <b className='text-foreground font-semibold'>{p.category.name}</b>
+									Категорія:{' '}
+									<b className='text-foreground font-semibold'>
+										{p.category.name}
+									</b>
 								</span>
 							</>
 						)}
@@ -232,8 +245,8 @@ export default async function ProductPage({ params }: Params) {
 
 					{inStock ? (
 						<div className='text-success mb-3.5 inline-flex items-center gap-2 text-[13px] font-semibold'>
-							<span className='bg-success h-2 w-2 rounded-full' />
-							В наявності — відправка сьогодні
+							<span className='bg-success h-2 w-2 rounded-full' />В наявності —
+							відправка сьогодні
 						</div>
 					) : (
 						<div className='text-muted-foreground mb-3.5 inline-flex items-center gap-2 text-[13px] font-semibold'>
@@ -244,7 +257,9 @@ export default async function ProductPage({ params }: Params) {
 
 					{compat.length > 0 && (
 						<div className='mb-[18px] flex flex-wrap items-center gap-2'>
-							<span className='text-muted-foreground text-[13px] font-semibold'>Сумісність:</span>
+							<span className='text-muted-foreground text-[13px] font-semibold'>
+								Сумісність:
+							</span>
 							{compat.map(c => (
 								<span
 									key={c}
@@ -301,6 +316,27 @@ export default async function ProductPage({ params }: Params) {
 								/>
 							</>
 						)}
+
+						<div className='mt-2.5'>
+							<WishlistButton
+								variant='detail'
+								product={{
+									id: p.id,
+									slug: p.slug,
+									sku: p.sku,
+									name: p.name,
+									price: p.price,
+									oldPrice: p.oldPrice,
+									onSale: p.onSale,
+									type: p.type,
+									condition: p.condition,
+									stockQty: p.stockQty,
+									category: p.category,
+									images: p.images,
+									hasLivePhotos: (p.livePhotos?.length ?? 0) > 0
+								}}
+							/>
+						</div>
 
 						<div className='mt-4 flex flex-wrap gap-5'>
 							<LeadButton
@@ -383,4 +419,3 @@ const Badge = ({
 		{children}
 	</span>
 )
-

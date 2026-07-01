@@ -1,6 +1,7 @@
 export const UI_ROUTES = {
 	HOME: '/',
 	SHOP: '/shop',
+	PRICE_SHEET: '/price-sheet',
 	CATEGORY: (model: string) => `/category/${model}`,
 	SUBCATEGORY: (model: string, category: string) => `/category/${model}/${category}`,
 	PRODUCT: (slug: string) => `/product/${slug}`,
@@ -9,6 +10,7 @@ export const UI_ROUTES = {
 	CHECKOUT: '/checkout',
 	ACCOUNT: '/account',
 	ACCOUNT_ORDERS: '/account/orders',
+	WISHLIST: '/wishlist',
 	LOGIN: '/auth/login',
 	REGISTER: '/auth/register',
 	BLOG: '/blog',

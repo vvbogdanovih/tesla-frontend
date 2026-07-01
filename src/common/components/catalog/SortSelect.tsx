@@ -9,7 +9,7 @@ const OPTIONS = [
 	{ v: 'price_desc', l: 'Дорожчі спершу' }
 ]
 
-export const SortSelect = () => {
+export const SortSelect = ({ basePath = '/shop' }: { basePath?: string }) => {
 	const router = useRouter()
 	const sp = useSearchParams()
 
@@ -18,7 +18,7 @@ export const SortSelect = () => {
 		if (value && value !== 'default') params.set('sort', value)
 		else params.delete('sort')
 		params.delete('page')
-		router.push(`/shop?${params.toString()}`)
+		router.push(`${basePath}?${params.toString()}`)
 	}
 
 	return (

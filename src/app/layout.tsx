@@ -27,12 +27,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<html lang='uk' className={`${onest.variable} ${unbounded.variable}`}>
+		<html lang='uk' className={`${onest.variable} ${unbounded.variable}`} suppressHydrationWarning>
 			<body className='antialiased' suppressHydrationWarning>
+				{/* Тема до гідрації (без FOUC): збережений вибір або системна перевага */}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d)}catch(e){}})()`
+					}}
+				/>
 				{/* Лого Tesla у фоні (×3 від адмінки) */}
 				<div
 					aria-hidden
-					className='pointer-events-none fixed inset-0 z-0 bg-center bg-no-repeat opacity-[0.05]'
+					className='pointer-events-none fixed inset-0 z-0 bg-center bg-no-repeat opacity-[0.05] dark:brightness-0 dark:invert'
 					style={{ backgroundImage: "url('/tesla.svg')", backgroundSize: 'min(2100px, 165vw)' }}
 				/>
 				<Providers>

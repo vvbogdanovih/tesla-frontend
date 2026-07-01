@@ -19,6 +19,10 @@ export interface CatalogProduct {
 	stockQty: number
 	category: { name: string; slug: string } | null
 	images: CatalogImage[]
+	// чи має товар «живі фото» — для плашки на картці (опційне; старіший API може не віддавати)
+	hasLivePhotos?: boolean
+	// перелік сумісних моделей — лише коли запит із include=fitment (прайс-лист)
+	compatibility?: string[]
 }
 
 export interface CatalogResponse {
@@ -52,6 +56,9 @@ export interface ProductDetail {
 	seo?: { title?: string; description?: string }
 	category: { name: string; slug: string } | null
 	images: CatalogImage[]
+	// «Живі фото» — реальні знімки екземпляра; окремий блок, лише за наявності.
+	// Опційне: старіші відповіді API можуть не містити поля (тоді трактуємо як [])
+	livePhotos?: CatalogImage[]
 	cars: ProductCar[]
 }
 

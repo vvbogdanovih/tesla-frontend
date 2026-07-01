@@ -15,6 +15,10 @@ export const API_URLS = {
 		ADDRESSES: `/account/addresses`,
 		ORDERS: `/account/orders`
 	},
+	WISHLIST: {
+		BASE: `/account/wishlist`,
+		TOGGLE: (productId: string) => `/account/wishlist/${productId}`
+	},
 	// Публічний каталог
 	CATALOG: {
 		PRODUCTS: `/catalog/products`,
