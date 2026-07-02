@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
 import { ImageOff, ShoppingCart, Trash2 } from 'lucide-react'
 import { UI_ROUTES } from '@/common/constants'
 import { formatMoney } from '@/common/utils/format'
@@ -54,7 +53,13 @@ export default function CartPage() {
 								className='bg-muted relative h-24 w-24 shrink-0 overflow-hidden rounded-xl'
 							>
 								{i.image ? (
-									<Image src={i.image} alt={i.name} fill sizes='96px' className='object-cover' />
+									<Image
+										src={i.image}
+										alt={i.name}
+										fill
+										sizes='96px'
+										className='object-cover'
+									/>
 								) : (
 									<ImageOff className='text-muted-foreground absolute inset-0 m-auto h-6 w-6' />
 								)}
@@ -67,7 +72,9 @@ export default function CartPage() {
 								>
 									{i.name}
 								</Link>
-								<p className='text-muted-foreground mt-0.5 font-mono text-xs'>{i.sku}</p>
+								<p className='text-muted-foreground mt-0.5 font-mono text-xs'>
+									{i.sku}
+								</p>
 
 								<div className='mt-auto flex items-end justify-between pt-2'>
 									<QtyStepper
@@ -80,7 +87,9 @@ export default function CartPage() {
 									<div className='text-right'>
 										<p className='font-bold'>{formatMoney(i.price * i.qty)}</p>
 										{i.qty > 1 && (
-											<p className='text-muted-foreground text-xs'>{formatMoney(i.price)} / шт</p>
+											<p className='text-muted-foreground text-xs'>
+												{formatMoney(i.price)} / шт
+											</p>
 										)}
 									</div>
 								</div>
@@ -111,13 +120,12 @@ export default function CartPage() {
 						<span className='text-muted-foreground text-sm'>Разом</span>
 						<span className='text-2xl font-extrabold'>{formatMoney(total)}</span>
 					</div>
-					<button
-						type='button'
-						onClick={() => toast('Оформлення замовлення — наступний крок 🚧')}
+					<Link
+						href={UI_ROUTES.CHECKOUT}
 						className='bg-primary text-primary-foreground mt-5 flex h-12 w-full items-center justify-center rounded-xl text-sm font-bold transition-opacity hover:opacity-90'
 					>
 						Оформити замовлення
-					</button>
+					</Link>
 					<Link
 						href={UI_ROUTES.SHOP}
 						className='text-muted-foreground hover:text-foreground mt-3 block text-center text-sm'

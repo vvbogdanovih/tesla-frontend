@@ -1,4 +1,5 @@
 export * from './api-routes.constants'
 export * from './ui-routes.constants'
+export * from './order-labels.constants'
 export * from './role.constants'
 export * from './seo.constants'

@@ -67,7 +67,7 @@ export default function AccountPage() {
 				</dl>
 			</section>
 
-			{/* Розділи (заглушки — реалізація згодом) */}
+			{/* Розділи кабінету */}
 			<div className='mt-6 grid gap-4 sm:grid-cols-2'>
 				<Tile
 					href={UI_ROUTES.ACCOUNT_ORDERS}

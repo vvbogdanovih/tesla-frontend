@@ -40,7 +40,12 @@ export const API_URLS = {
 	},
 	ORDERS: {
 		BASE: `/orders`,
-		BY_ID: (id: string) => `/orders/${id}`
+		BY_ID: (id: string) => `/orders/${id}`,
+		// Публічний lookup для сторінки успіху (безпечні поля)
+		BY_NUMBER: (number: string) => `/orders/${number}`
+	},
+	PAYMENT_REQUISITES: {
+		ACTIVE: `/payment-requisites/active`
 	},
 	LEADS: {
 		BASE: `/leads`,

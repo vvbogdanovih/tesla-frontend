@@ -101,6 +101,9 @@ const LoginForm = () => {
 }
 
 export default function LoginPage() {
+	// react-hook-form v7 несумісний із React Compiler (ламає відстеження полів) — вимикаємо
+	'use no memo'
+
 	return (
 		<Suspense>
 			<LoginForm />
