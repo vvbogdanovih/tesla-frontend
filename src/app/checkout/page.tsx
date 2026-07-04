@@ -15,6 +15,7 @@ import { useCartStore, useCartTotal } from '@/common/store/useCartStore'
 import { ordersApi, stashLastOrder, type CreateOrderPayload } from '@/common/services/orders.api'
 import { AuthField, authInputClass } from '@/common/components/auth/parts'
 import { IbanRequisites } from '@/common/components/checkout/IbanRequisites'
+import { NpDeliveryPicker } from '@/common/components/checkout/NpDeliveryPicker'
 
 // Український мобільний: +380XXXXXXXXX (приймаємо 0XX…, 380…, з пробілами/дужками)
 const cleanPhone = (raw: string) => raw.replace(/[\s\-()]/g, '')
@@ -38,11 +39,31 @@ const schema = z
 		delivery: z.enum(['np', 'ukrposhta', 'pickup']),
 		city: z.string().trim().optional(),
 		warehouse: z.string().trim().optional(),
+		// Nova Poshta — обрані з довідника (ADR-0014)
+		cityRef: z.string().optional(),
+		warehouseRef: z.string().optional(),
+		warehouseType: z.enum(['branch', 'postomat', 'cargo']).optional(),
 		paymentMethod: z.enum(['cod', 'iban', 'cash']),
 		comment: z.string().trim().max(1000, 'Занадто довгий коментар').optional()
 	})
 	.superRefine((values, ctx) => {
-		if (values.delivery !== 'pickup') {
+		if (values.delivery === 'np') {
+			// НП — обовʼязково вибір із довідника (є ref), а не довільний текст
+			if (!values.cityRef) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['city'],
+					message: 'Оберіть місто зі списку'
+				})
+			}
+			if (!values.warehouseRef) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['warehouse'],
+					message: 'Оберіть відділення або поштомат'
+				})
+			}
+		} else if (values.delivery === 'ukrposhta') {
 			if (!values.city) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
@@ -88,8 +109,9 @@ export default function CheckoutPage() {
 		handleSubmit,
 		control,
 		setValue,
+		trigger,
 		reset,
-		formState: { errors, isSubmitting, isDirty }
+		formState: { errors, isSubmitting, isDirty, isSubmitted }
 	} = useForm<FormValues>({
 		resolver: zodResolver(schema),
 		defaultValues: {
@@ -99,6 +121,8 @@ export default function CheckoutPage() {
 			delivery: 'np',
 			city: '',
 			warehouse: '',
+			cityRef: '',
+			warehouseRef: '',
 			paymentMethod: 'cod',
 			comment: ''
 		}
@@ -129,6 +153,18 @@ export default function CheckoutPage() {
 		}
 	}, [delivery, paymentMethod, setValue])
 
+	// Зміна способу доставки скидає адресні поля (щоб НП-снапшот не «протік» в Укрпошту)
+	const prevDelivery = useRef(delivery)
+	useEffect(() => {
+		if (prevDelivery.current === delivery) return
+		prevDelivery.current = delivery
+		setValue('city', '')
+		setValue('warehouse', '')
+		setValue('cityRef', '')
+		setValue('warehouseRef', '')
+		setValue('warehouseType', undefined)
+	}, [delivery, setValue])
+
 	const onSubmit = handleSubmit(async values => {
 		const payload: CreateOrderPayload = {
 			items: items.map(i => ({ productId: i.productId, qty: i.qty })),
@@ -140,7 +176,13 @@ export default function CheckoutPage() {
 			delivery: {
 				method: values.delivery,
 				...(values.delivery !== 'pickup'
-					? { city: values.city, warehouse: values.warehouse }
+					? {
+							city: values.city,
+							warehouse: values.warehouse,
+							...(values.cityRef ? { cityRef: values.cityRef } : {}),
+							...(values.warehouseRef ? { warehouseRef: values.warehouseRef } : {}),
+							...(values.warehouseType ? { warehouseType: values.warehouseType } : {})
+						}
 					: {})
 			},
 			paymentMethod: values.paymentMethod,
@@ -263,6 +305,21 @@ export default function CheckoutPage() {
 										замовлення буде готове до видачі.
 									</span>
 								</div>
+							) : delivery === 'np' ? (
+								<NpDeliveryPicker
+									cityError={errors.city?.message}
+									warehouseError={errors.warehouse?.message}
+									onChange={patch => {
+										for (const [k, v] of Object.entries(patch)) {
+											setValue(k as keyof FormValues, v as never, {
+												shouldDirty: true
+											})
+										}
+										// помилки висять на city/warehouse, а змінюються cityRef/warehouseRef —
+										// ре-валідуємо саме ці поля (лише після спроби сабміту, щоб не блимати завчасно)
+										if (isSubmitted) void trigger(['city', 'warehouse'])
+									}}
+								/>
 							) : (
 								<div className='mt-2.5 grid gap-3 sm:grid-cols-2'>
 									<AuthField label='Місто' error={errors.city?.message}>

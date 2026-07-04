@@ -73,7 +73,15 @@ export type PaymentMethod = 'cod' | 'iban' | 'cash'
 export interface CreateOrderPayload {
 	items: { productId: string; qty: number }[]
 	customer: { name: string; phone: string; email?: string }
-	delivery: { method: DeliveryMethod; city?: string; warehouse?: string }
+	delivery: {
+		method: DeliveryMethod
+		city?: string
+		warehouse?: string
+		// Nova Poshta — refs/тип зі снапшоту (ADR-0014), для майбутнього ТТН
+		cityRef?: string
+		warehouseRef?: string
+		warehouseType?: 'branch' | 'postomat' | 'cargo'
+	}
 	paymentMethod: PaymentMethod
 	comment?: string
 }
