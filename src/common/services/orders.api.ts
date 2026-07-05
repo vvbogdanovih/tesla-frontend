@@ -37,7 +37,9 @@ export const orderSchema = z.object({
 	}),
 	payment: paymentSchema,
 	comment: z.string().nullish(),
-	items: z.array(orderItemSchema)
+	items: z.array(orderItemSchema),
+	// Онлайн-оплата: посилання на сторінку monopay (лише у відповіді на create для method=card)
+	paymentUrl: z.string().url().optional()
 })
 
 // Публічний lookup за номером — лише безпечні поля
@@ -68,7 +70,7 @@ export type PaymentRequisites = z.infer<typeof paymentRequisitesSchema>
 // ── Пейлоад створення замовлення ────────────────────────────────────────────
 
 export type DeliveryMethod = 'np' | 'ukrposhta' | 'pickup'
-export type PaymentMethod = 'cod' | 'iban' | 'cash'
+export type PaymentMethod = 'cod' | 'iban' | 'cash' | 'card'
 
 export interface CreateOrderPayload {
 	items: { productId: string; qty: number }[]

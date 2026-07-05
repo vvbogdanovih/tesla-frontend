@@ -37,6 +37,26 @@ export const PAYMENT_METHOD_LABEL: Record<string, string> = {
 
 export const paymentMethodLabel = (method: string): string => PAYMENT_METHOD_LABEL[method] ?? method
 
+// Статус оплати (для онлайн-оплати карткою)
+export const PAYMENT_STATUS_LABEL: Record<string, string> = {
+	pending: 'Очікує оплати',
+	paid: 'Оплачено',
+	failed: 'Оплата не пройшла',
+	refunded: 'Кошти повернено'
+}
+
+export const PAYMENT_STATUS_BADGE: Record<string, string> = {
+	pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+	paid: 'bg-green-500/10 text-green-600 dark:text-green-400',
+	failed: 'bg-red-500/10 text-red-600 dark:text-red-400',
+	refunded: 'bg-muted text-muted-foreground'
+}
+
+export const paymentStatusLabel = (status: string): string => PAYMENT_STATUS_LABEL[status] ?? status
+
+export const paymentStatusBadgeClass = (status: string): string =>
+	PAYMENT_STATUS_BADGE[status] ?? ORDER_STATUS_BADGE_FALLBACK
+
 export const DELIVERY_METHOD_LABEL: Record<string, string> = {
 	np: 'Нова Пошта',
 	ukrposhta: 'Укрпошта',

@@ -43,7 +43,7 @@ const schema = z
 		cityRef: z.string().optional(),
 		warehouseRef: z.string().optional(),
 		warehouseType: z.enum(['branch', 'postomat', 'cargo']).optional(),
-		paymentMethod: z.enum(['cod', 'iban', 'cash']),
+		paymentMethod: z.enum(['cod', 'iban', 'cash', 'card']),
 		comment: z.string().trim().max(1000, 'Занадто довгий коментар').optional()
 	})
 	.superRefine((values, ctx) => {
@@ -194,6 +194,12 @@ export default function CheckoutPage() {
 			stashLastOrder(order)
 			setPlaced(true)
 			clear()
+			// Онлайн-оплата: бекенд повернув посилання на monopay — ведемо на оплату.
+			// Після оплати monopay поверне на /order/{n}/success (redirectUrl інвойсу).
+			if (order.paymentUrl) {
+				window.location.assign(order.paymentUrl)
+				return
+			}
 			router.replace(`/order/${encodeURIComponent(order.orderNumber)}/success`)
 		} catch (err) {
 			// 400/409 (нестача залишків тощо) — українське повідомлення з бекенда; кошик не чистимо
@@ -340,8 +346,14 @@ export default function CheckoutPage() {
 							)}
 						</Block>
 
-						{/* 3 · Оплата (картка онлайн зʼявиться пізніше — MonoPay) */}
+						{/* 3 · Оплата */}
 						<Block num={3} title='Оплата'>
+							<RadioCard
+								checked={paymentMethod === 'card'}
+								title='Картка онлайн'
+								desc='Visa / Mastercard, Apple Pay, Google Pay (mono)'
+								inputProps={{ value: 'card', ...register('paymentMethod') }}
+							/>
 							<RadioCard
 								checked={paymentMethod === 'cod'}
 								title='Накладений платіж'

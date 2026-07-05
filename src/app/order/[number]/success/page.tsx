@@ -1,19 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, PackageSearch } from 'lucide-react'
+import { CheckCircle2, CreditCard, Loader2, PackageSearch } from 'lucide-react'
 import {
 	UI_ROUTES,
 	deliveryMethodLabel,
 	orderStatusBadgeClass,
 	orderStatusLabel,
-	paymentMethodLabel
+	paymentMethodLabel,
+	paymentStatusBadgeClass,
+	paymentStatusLabel
 } from '@/common/constants'
 import { formatMoney } from '@/common/utils/format'
 import { ordersApi, readLastOrder, type Order } from '@/common/services/orders.api'
+import { paymentsApi } from '@/common/services/payments.api'
 import { IbanRequisites } from '@/common/components/checkout/IbanRequisites'
 import { FullScreenLoader } from '@/common/components'
 
@@ -49,6 +52,33 @@ export default function OrderSuccessPage() {
 	})
 
 	const order = stashed ?? fetched
+	const isCard = order?.payment.method === 'card'
+
+	// Онлайн-оплата: поллимо статус (fallback до вебхука), поки не вийде з pending
+	const { data: payData } = useQuery({
+		queryKey: ['pay-status', orderNumber],
+		queryFn: () => paymentsApi.status(orderNumber),
+		enabled: isCard,
+		retry: false,
+		refetchInterval: q => {
+			const s = q.state.data?.paymentStatus
+			return s && s !== 'pending' ? false : 4000
+		}
+	})
+	const paymentStatus = payData?.paymentStatus ?? order?.payment.status ?? 'pending'
+	const canPay = isCard && (paymentStatus === 'pending' || paymentStatus === 'failed')
+
+	const [paying, setPaying] = useState(false)
+	const handlePay = async () => {
+		setPaying(true)
+		try {
+			const { pageUrl } = await paymentsApi.createInvoice(orderNumber)
+			window.location.assign(pageUrl)
+		} catch {
+			// помилку показує тост http-сервісу; лишаємось на сторінці
+			setPaying(false)
+		}
+	}
 
 	if (!order && isPending) return <FullScreenLoader />
 
@@ -71,10 +101,20 @@ export default function OrderSuccessPage() {
 	return (
 		<main className='mx-auto max-w-[640px] px-6 py-12'>
 			<div className='border-border bg-card rounded-2xl border p-6 text-center sm:p-8'>
-				<CheckCircle2 className='text-success mx-auto mb-4 h-14 w-14' />
-				<h1 className='font-display text-2xl font-medium'>Замовлення оформлено</h1>
+				{canPay ? (
+					<CreditCard className='text-accent-text mx-auto mb-4 h-14 w-14' />
+				) : (
+					<CheckCircle2 className='text-success mx-auto mb-4 h-14 w-14' />
+				)}
+				<h1 className='font-display text-2xl font-medium'>
+					{canPay ? 'Замовлення прийнято' : 'Замовлення оформлено'}
+				</h1>
 				<p className='text-muted-foreground mt-2 text-sm'>
-					Дякуємо! Ми вже його обробляємо.
+					{canPay
+						? 'Залишилось завершити оплату карткою.'
+						: isCard && paymentStatus === 'paid'
+							? 'Дякуємо! Оплату отримано.'
+							: 'Дякуємо! Ми вже його обробляємо.'}
 				</p>
 
 				<p className='font-display mt-5 text-3xl font-bold tracking-wide'>
@@ -97,6 +137,18 @@ export default function OrderSuccessPage() {
 							{paymentMethodLabel(order.payment.method)}
 						</dd>
 					</div>
+					{isCard && (
+						<div className='flex items-center justify-between py-1.5'>
+							<dt className='text-muted-foreground'>Статус оплати</dt>
+							<dd>
+								<span
+									className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${paymentStatusBadgeClass(paymentStatus)}`}
+								>
+									{paymentStatusLabel(paymentStatus)}
+								</span>
+							</dd>
+						</div>
+					)}
 					{stashed && (
 						<div className='flex justify-between gap-4 py-1.5'>
 							<dt className='text-muted-foreground'>Доставка</dt>
@@ -137,6 +189,27 @@ export default function OrderSuccessPage() {
 				{order.payment.method === 'iban' && (
 					<div className='mt-4 text-left'>
 						<IbanRequisites orderNumber={order.orderNumber} />
+					</div>
+				)}
+
+				{canPay && (
+					<div className='mt-6'>
+						<button
+							type='button'
+							onClick={handlePay}
+							disabled={paying}
+							className='bg-primary text-primary-foreground flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-60'
+						>
+							{paying && <Loader2 className='h-4 w-4 animate-spin' />}
+							{paying
+								? 'Переходимо до оплати…'
+								: paymentStatus === 'failed'
+									? 'Спробувати оплату ще раз'
+									: 'Перейти до оплати'}
+						</button>
+						<p className='text-muted-foreground mt-2 text-xs'>
+							Статус оновиться автоматично після оплати.
+						</p>
 					</div>
 				)}
 

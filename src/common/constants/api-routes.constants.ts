@@ -47,6 +47,10 @@ export const API_URLS = {
 	PAYMENT_REQUISITES: {
 		ACTIVE: `/payment-requisites/active`
 	},
+	PAYMENTS: {
+		MONOPAY_INVOICE: `/payments/monopay/invoice`,
+		MONOPAY_STATUS: (number: string) => `/payments/monopay/status/${number}`
+	},
 	LEADS: {
 		BASE: `/leads`,
 		PRICE_MATCH: `/leads/price-match`,
