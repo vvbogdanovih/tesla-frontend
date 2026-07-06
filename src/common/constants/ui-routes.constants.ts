@@ -2,8 +2,6 @@ export const UI_ROUTES = {
 	HOME: '/',
 	SHOP: '/shop',
 	PRICE_SHEET: '/price-sheet',
-	CATEGORY: (model: string) => `/category/${model}`,
-	SUBCATEGORY: (model: string, category: string) => `/category/${model}/${category}`,
 	PRODUCT: (slug: string) => `/product/${slug}`,
 	SEARCH: '/search',
 	CART: '/cart',
@@ -13,11 +11,7 @@ export const UI_ROUTES = {
 	WISHLIST: '/wishlist',
 	LOGIN: '/auth/login',
 	REGISTER: '/auth/register',
-	BLOG: '/blog',
-	ABOUT: '/about',
-	CONTACTS: '/contacts',
-	DELIVERY: '/delivery',
-	RETURNS: '/returns',
-	PRIVACY: '/privacy',
-	OFFER: '/offer'
+	// Українські slug'и — відповідають старому сайту (SEO-наступність, ADR-0001)
+	ABOUT: '/pro-nas',
+	CONTACTS: '/kontakty'
 } as const

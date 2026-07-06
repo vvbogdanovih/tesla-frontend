@@ -3,15 +3,29 @@ import { catalogApi } from '@/common/services/catalog.api'
 import { CatalogFilters } from '@/common/components/catalog/CatalogFilters'
 import { PriceSheet } from '@/common/components/catalog/PriceSheet'
 import { UI_ROUTES } from '@/common/constants'
-
-export const metadata: Metadata = {
-	title: 'Прайс-лист запчастин Tesla',
-	description:
-		'Повний прайс-лист запчастин Tesla (Model 3 · Y · S · X) — таблиця з артикулами, сумісністю, цінами та наявністю. Фільтри за моделлю, типом і станом.'
-}
+import { SITE_URL } from '@/common/constants/seo.constants'
 
 // ті самі фільтри, що й у каталозі; стан — в URL
 const FILTER_KEYS = ['q', 'category', 'car', 'type', 'condition', 'inStock', 'minPrice', 'maxPrice', 'sort']
+
+// Одна індексована price-sheet-URL (ADR-0011 «власне SEO»): базова → index, self-canonical;
+// будь-який фасет → noindex,follow + canonical на базу (категорійні/фасетні index-сторінки — за /shop).
+export async function generateMetadata({
+	searchParams
+}: {
+	searchParams: Promise<Record<string, string | string[] | undefined>>
+}): Promise<Metadata> {
+	const sp = await searchParams
+	const isFaceted = FILTER_KEYS.some(k => typeof sp[k] === 'string' && sp[k])
+
+	return {
+		title: 'Прайс-лист запчастин Tesla — артикули, сумісність, ціни',
+		description:
+			'Повний прайс-лист запчастин Tesla (Model 3 · Y · S · X) — таблиця з артикулами, сумісністю, цінами та наявністю. Фільтри за моделлю, типом і станом.',
+		alternates: { canonical: `${SITE_URL}${UI_ROUTES.PRICE_SHEET}` },
+		robots: isFaceted ? { index: false, follow: true } : undefined
+	}
+}
 
 const PAGE_SIZE = 50
 

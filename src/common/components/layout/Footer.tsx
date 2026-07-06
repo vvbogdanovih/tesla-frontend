@@ -16,20 +16,17 @@ export const Footer = () => {
 					<Link href={UI_ROUTES.SHOP} className='block py-1 text-sm'>
 						Усі категорії
 					</Link>
-					<Link href={UI_ROUTES.BLOG} className='block py-1 text-sm'>
-						Блог
+					<Link href={UI_ROUTES.PRICE_SHEET} className='block py-1 text-sm'>
+						Прайс-лист
 					</Link>
 				</div>
 				<div>
 					<h4 className='text-foreground mb-3 text-sm font-bold'>Інформація</h4>
-					<Link href={UI_ROUTES.DELIVERY} className='block py-1 text-sm'>
-						Доставка та оплата
+					<Link href={UI_ROUTES.ABOUT} className='block py-1 text-sm'>
+						Про нас
 					</Link>
-					<Link href={UI_ROUTES.RETURNS} className='block py-1 text-sm'>
-						Обмін та повернення
-					</Link>
-					<Link href={UI_ROUTES.OFFER} className='block py-1 text-sm'>
-						Договір оферти
+					<Link href={UI_ROUTES.CONTACTS} className='block py-1 text-sm'>
+						Контакти
 					</Link>
 				</div>
 				<div>

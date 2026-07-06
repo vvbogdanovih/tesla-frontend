@@ -4,11 +4,65 @@ import { ProductCard } from '@/common/components/catalog/ProductCard'
 import { CatalogFilters } from '@/common/components/catalog/CatalogFilters'
 import { SortSelect } from '@/common/components/catalog/SortSelect'
 import { Pagination } from '@/common/components/catalog/Pagination'
+import { SITE_URL } from '@/common/constants/seo.constants'
+import { UI_ROUTES } from '@/common/constants'
 
-export const metadata: Metadata = {
-	title: 'Каталог запчастин Tesla',
-	description:
-		'Оригінальні та аналогові запчастини Tesla (Model 3 · Y · S · X) — фільтри за моделлю, типом, наявністю та ціною.'
+// Динамічні meta + canonical (ADR/seo-strategy):
+//  • базова /shop та /shop?category= → index, self-canonical на чистий шлях;
+//  • інші фасети/сортування/пагінація → noindex,follow + canonical на базу.
+export async function generateMetadata({
+	searchParams
+}: {
+	searchParams: Promise<Record<string, string | string[] | undefined>>
+}): Promise<Metadata> {
+	const sp = await searchParams
+	const s = (k: string) => (typeof sp[k] === 'string' ? (sp[k] as string) : undefined)
+	const categorySlug = s('category')
+	const carSlug = s('car')
+	const page = s('page')
+
+	let title = 'Каталог запчастин Tesla'
+	const parts: string[] = []
+	if (categorySlug) {
+		const cats = await catalogApi.categories().catch(() => [])
+		const c = cats.find(x => x.slug === categorySlug)
+		if (c) {
+			title = `${c.name} — запчастини Tesla`
+			parts.push(c.name)
+		}
+	}
+	if (carSlug) {
+		const cars = await catalogApi.cars().catch(() => [])
+		const car = cars.find(x => x.slug === carSlug)
+		if (car) parts.push(car.generation ?? car.model)
+	}
+	if (page && page !== '1') title += ` — сторінка ${page}`
+
+	// canonical: лише category → категорійна база; решта фасетів → чиста /shop
+	const canonical = categorySlug
+		? `${SITE_URL}${UI_ROUTES.SHOP}?category=${categorySlug}`
+		: `${SITE_URL}${UI_ROUTES.SHOP}`
+
+	// фасети/сортування/пагінація → noindex,follow
+	const isFaceted = Boolean(
+		carSlug ||
+			s('sort') ||
+			s('inStock') ||
+			s('minPrice') ||
+			s('maxPrice') ||
+			s('type') ||
+			s('condition') ||
+			(page && page !== '1')
+	)
+
+	return {
+		title,
+		description: parts.length
+			? `Запчастини Tesla ${parts.join(' · ')} — фільтри за моделлю, типом, наявністю та ціною.`
+			: 'Оригінальні та аналогові запчастини Tesla (Model 3 · Y · S · X) — фільтри за моделлю, типом, наявністю та ціною.',
+		alternates: { canonical },
+		robots: isFaceted ? { index: false, follow: true } : undefined
+	}
 }
 
 const FILTER_KEYS = [
