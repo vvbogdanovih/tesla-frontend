@@ -8,6 +8,7 @@ export const UI_ROUTES = {
 	CHECKOUT: '/checkout',
 	ACCOUNT: '/account',
 	ACCOUNT_ORDERS: '/account/orders',
+	ACCOUNT_ADDRESSES: '/account/addresses',
 	WISHLIST: '/wishlist',
 	LOGIN: '/auth/login',
 	REGISTER: '/auth/register',

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Heart, LogOut, Package, User } from 'lucide-react'
+import { Heart, LogOut, MapPin, Package, User } from 'lucide-react'
 import { useAuthStore } from '@/common/store/useAuthStore'
 import { UI_ROUTES } from '@/common/constants/ui-routes.constants'
 import { FullScreenLoader } from '@/common/components'
@@ -74,6 +74,12 @@ export default function AccountPage() {
 					icon={<Package className='h-5 w-5' />}
 					title='Мої замовлення'
 					subtitle='Історія та статуси замовлень'
+				/>
+				<Tile
+					href={UI_ROUTES.ACCOUNT_ADDRESSES}
+					icon={<MapPin className='h-5 w-5' />}
+					title='Адреси доставки'
+					subtitle='Збережені адреси для замовлень'
 				/>
 				<Tile
 					href={UI_ROUTES.WISHLIST}
