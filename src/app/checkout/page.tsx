@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import { Loader2, MapPin, Plus, UserCheck } from 'lucide-react'
 import { UI_ROUTES } from '@/common/constants'
 import { formatMoney } from '@/common/utils/format'
+import { cleanPhone, normalizePhone } from '@/common/utils/phone'
 import { useAuthStore } from '@/common/store/useAuthStore'
 import { useCartStore, useCartTotal } from '@/common/store/useCartStore'
 import { ordersApi, stashLastOrder, type CreateOrderPayload } from '@/common/services/orders.api'
@@ -18,16 +19,7 @@ import { addressesApi, type Address } from '@/common/services/addresses.api'
 import { AuthField, authInputClass } from '@/common/components/auth/parts'
 import { IbanRequisites } from '@/common/components/checkout/IbanRequisites'
 import { NpDeliveryPicker } from '@/common/components/checkout/NpDeliveryPicker'
-
-// Український мобільний: +380XXXXXXXXX (приймаємо 0XX…, 380…, з пробілами/дужками)
-const cleanPhone = (raw: string) => raw.replace(/[\s\-()]/g, '')
-const normalizePhone = (raw: string) => {
-	const p = cleanPhone(raw)
-	if (p.startsWith('+380')) return p
-	if (p.startsWith('380')) return `+${p}`
-	if (p.startsWith('0')) return `+38${p}`
-	return p
-}
+import { UpDeliveryFields } from '@/common/components/checkout/UpDeliveryFields'
 
 const schema = z
 	.object({
@@ -159,6 +151,8 @@ export default function CheckoutPage() {
 
 	const delivery = useWatch({ control, name: 'delivery' })
 	const paymentMethod = useWatch({ control, name: 'paymentMethod' })
+	// для Укрпошти: поле «Відділення» активується після вводу міста (як у флоу НП)
+	const cityValue = useWatch({ control, name: 'city' })
 
 	// Готівка доступна лише при самовивозі — інакше повертаємо накладений платіж
 	useEffect(() => {
@@ -264,12 +258,7 @@ export default function CheckoutPage() {
 			const order = await ordersApi.create(payload)
 
 			// Зберегти введену адресу в профіль (лише авторизований, нова адреса, не самовивіз)
-			if (
-				user &&
-				saveToProfile &&
-				addrChoice === 'new' &&
-				values.delivery !== 'pickup'
-			) {
+			if (user && saveToProfile && addrChoice === 'new' && values.delivery !== 'pickup') {
 				try {
 					await addressesApi.create(
 						{
@@ -496,25 +485,13 @@ export default function CheckoutPage() {
 											}}
 										/>
 									) : (
-										<div className='mt-2.5 grid gap-3 sm:grid-cols-2'>
-											<AuthField label='Місто' error={errors.city?.message}>
-												<input
-													className={authInputClass}
-													placeholder='Напр., Львів'
-													{...register('city')}
-												/>
-											</AuthField>
-											<AuthField
-												label='Відділення'
-												error={errors.warehouse?.message}
-											>
-												<input
-													className={authInputClass}
-													placeholder='Напр., Відділення №1'
-													{...register('warehouse')}
-												/>
-											</AuthField>
-										</div>
+										<UpDeliveryFields
+											cityError={errors.city?.message}
+											warehouseError={errors.warehouse?.message}
+											warehouseDisabled={!cityValue?.trim()}
+											cityInputProps={register('city')}
+											warehouseInputProps={register('warehouse')}
+										/>
 									)}
 
 									{/* Пропозиція зберегти адресу — лише авторизований, не самовивіз */}

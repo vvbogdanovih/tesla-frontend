@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { authInputClass, AuthField } from '@/common/components/auth/parts'
 import { NpDeliveryPicker } from '@/common/components/checkout/NpDeliveryPicker'
+import { UpDeliveryFields } from '@/common/components/checkout/UpDeliveryFields'
 import type { Address, AddressPayload } from '@/common/services/addresses.api'
 
 type Method = 'np' | 'ukrposhta'
@@ -80,7 +81,10 @@ export const AddressForm = ({
 				<MethodButton active={method === 'np'} onClick={() => setMethod('np')}>
 					Нова Пошта
 				</MethodButton>
-				<MethodButton active={method === 'ukrposhta'} onClick={() => setMethod('ukrposhta')}>
+				<MethodButton
+					active={method === 'ukrposhta'}
+					onClick={() => setMethod('ukrposhta')}
+				>
 					Укрпошта
 				</MethodButton>
 			</div>
@@ -99,31 +103,25 @@ export const AddressForm = ({
 							if (patch.city !== undefined) setCity(patch.city)
 							if (patch.cityRef !== undefined) setCityRef(patch.cityRef)
 							if (patch.warehouse !== undefined) setWarehouse(patch.warehouse)
-							if (patch.warehouseRef !== undefined) setWarehouseRef(patch.warehouseRef)
+							if (patch.warehouseRef !== undefined)
+								setWarehouseRef(patch.warehouseRef)
 							if (patch.warehouseType !== undefined)
 								setWarehouseType(patch.warehouseType)
 						}}
 					/>
 				</>
 			) : (
-				<div className='grid gap-3 sm:grid-cols-2'>
-					<AuthField label='Місто'>
-						<input
-							className={authInputClass}
-							placeholder='Напр., Львів'
-							value={city}
-							onChange={e => setCity(e.target.value)}
-						/>
-					</AuthField>
-					<AuthField label='Відділення'>
-						<input
-							className={authInputClass}
-							placeholder='Напр., Відділення №1'
-							value={warehouse}
-							onChange={e => setWarehouse(e.target.value)}
-						/>
-					</AuthField>
-				</div>
+				<UpDeliveryFields
+					warehouseDisabled={!city.trim()}
+					cityInputProps={{
+						value: city,
+						onChange: e => setCity(e.target.value)
+					}}
+					warehouseInputProps={{
+						value: warehouse,
+						onChange: e => setWarehouse(e.target.value)
+					}}
+				/>
 			)}
 
 			<div className='grid gap-3 sm:grid-cols-2'>
@@ -193,7 +191,9 @@ const MethodButton = ({
 		type='button'
 		onClick={onClick}
 		className={`flex-1 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
-			active ? 'border-primary bg-primary/5 text-accent-text' : 'border-border hover:bg-muted/50'
+			active
+				? 'border-primary bg-primary/5 text-accent-text'
+				: 'border-border hover:bg-muted/50'
 		}`}
 	>
 		{children}

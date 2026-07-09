@@ -9,6 +9,7 @@ interface AuthState {
 	isLoading: boolean
 	checkAuth: () => Promise<void>
 	login: (user: User) => void
+	setUser: (user: User) => void
 	logOut: () => Promise<void>
 	isUserLoggedIn: () => boolean
 	hasRole: (...roles: Role[]) => boolean
@@ -30,6 +31,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 
 	login: user => set({ user }),
+
+	// Оновити користувача після зміни профілю (форма /account)
+	setUser: user => set({ user }),
 
 	logOut: async () => {
 		try {

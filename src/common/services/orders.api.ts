@@ -4,13 +4,24 @@ import { API_URLS } from '@/common/constants/api-routes.constants'
 
 // ── Схеми відповідей бекенда ────────────────────────────────────────────────
 
+// Поточний стан товару позиції — бекенд додає лише в GET /account/orders
+// (мініатюри у списку замовлень + «Купити ще раз»)
+export const orderItemProductSchema = z.object({
+	slug: z.string(),
+	image: z.string().nullable(),
+	price: z.string(),
+	stockQty: z.number(),
+	isActive: z.boolean()
+})
+
 export const orderItemSchema = z.object({
 	id: z.string(),
-	productId: z.string(),
+	productId: z.string().nullable(), // null — товар видалено з каталогу
 	name: z.string(),
 	sku: z.string(),
 	price: z.string(), // Decimal приходить рядком
-	qty: z.number()
+	qty: z.number(),
+	product: orderItemProductSchema.nullish()
 })
 
 const paymentSchema = z.object({

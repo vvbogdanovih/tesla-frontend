@@ -12,6 +12,7 @@ export const API_URLS = {
 	},
 	ACCOUNT: {
 		PROFILE: `/account/profile`,
+		PROFILE_PASSWORD: `/account/profile/password`,
 		ADDRESSES: `/account/addresses`,
 		ORDERS: `/account/orders`
 	},

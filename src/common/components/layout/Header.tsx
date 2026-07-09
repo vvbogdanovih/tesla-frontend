@@ -39,39 +39,52 @@ export const Header = () => {
 						: 'border-border bg-card text-foreground border-b')
 				}
 			>
-				<div className='mx-auto flex h-16 max-w-[1240px] items-center gap-5 px-6'>
-					<Link href={UI_ROUTES.HOME} className='font-display text-lg font-bold tracking-wide'>
-						TESLA LVIV
-					</Link>
-					<nav className='hidden gap-4 text-sm font-medium md:flex'>
-						<Link href={UI_ROUTES.SHOP}>Магазин</Link>
-						<Link href={UI_ROUTES.PRICE_SHEET}>Прайс-лист</Link>
-						<Link href={UI_ROUTES.ABOUT}>Про нас</Link>
-						<Link href={UI_ROUTES.CONTACTS}>Контакти</Link>
-					</nav>
-					<SearchBox transparent={transparent} />
-					<div className='flex items-center gap-3'>
-						<ThemeToggle />
-						<AuthButton />
-						<WishlistHeart />
-						<button
-							type='button'
-							onClick={openCart}
-							aria-label='Кошик'
-							className='relative cursor-pointer'
-						>
-							<ShoppingCart className='h-5 w-5' />
-							{hydrated && count > 0 && (
-								<span className='bg-primary text-primary-foreground absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold leading-none'>
-									{count}
-								</span>
-							)}
-						</button>
+				<div className='mx-auto max-w-[1240px] px-6'>
+					<div className='flex h-16 items-center gap-5'>
+						<Link href={UI_ROUTES.HOME} className='font-display text-lg font-bold tracking-wide'>
+							TESLA LVIV
+						</Link>
+						<nav className='hidden gap-4 text-sm font-medium md:flex'>
+							<Link href={UI_ROUTES.SHOP}>Магазин</Link>
+							<Link href={UI_ROUTES.PRICE_SHEET}>Прайс-лист</Link>
+							<Link href={UI_ROUTES.ABOUT}>Про нас</Link>
+							<Link href={UI_ROUTES.CONTACTS}>Контакти</Link>
+						</nav>
+						{/* Пошук у рядку — лише на десктопі */}
+						<SearchBox
+							transparent={transparent}
+							className='relative mx-auto hidden max-w-md flex-1 md:block'
+						/>
+						<div className='ml-auto flex items-center gap-3'>
+							<ThemeToggle />
+							<AuthButton />
+							<WishlistHeart />
+							<button
+								type='button'
+								onClick={openCart}
+								aria-label='Кошик'
+								className='relative cursor-pointer'
+							>
+								<ShoppingCart className='h-5 w-5' />
+								{hydrated && count > 0 && (
+									<span className='bg-primary text-primary-foreground absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold leading-none'>
+										{count}
+									</span>
+								)}
+							</button>
+						</div>
 					</div>
+					{/* Пошук окремим рядком на всю ширину — лише на мобайлі (на головній є пошук у hero) */}
+					{!isHome && (
+						<div className='pb-3 md:hidden'>
+							<SearchBox transparent={transparent} className='relative w-full' />
+						</div>
+					)}
 				</div>
 			</header>
-			{/* відступ під фіксований хедер (на головній hero заходить під нього) */}
-			{!isHome && <div className='h-16' />}
+			{/* відступ під фіксований хедер (на головній hero заходить під нього);
+			    на мобайлі хедер вищий через окремий рядок пошуку */}
+			{!isHome && <div className='h-28 md:h-16' />}
 		</>
 	)
 }

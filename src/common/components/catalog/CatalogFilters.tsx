@@ -1,7 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Check } from 'lucide-react'
+import { Check, SlidersHorizontal, X } from 'lucide-react'
 import type { Car, Category } from '@/common/types'
 
 type Option = { v: string; l: string }
@@ -17,6 +18,19 @@ export const CatalogFilters = ({
 }) => {
 	const router = useRouter()
 	const sp = useSearchParams()
+	const [open, setOpen] = useState(false)
+
+	// блокування скролу body + закриття на Esc, поки відкрита мобільна панель
+	useEffect(() => {
+		if (!open) return
+		document.body.style.overflow = 'hidden'
+		const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+		window.addEventListener('keydown', onKey)
+		return () => {
+			document.body.style.overflow = ''
+			window.removeEventListener('keydown', onKey)
+		}
+	}, [open])
 
 	const setParam = (key: string, value: string) => {
 		const params = new URLSearchParams(sp.toString())
@@ -39,8 +53,16 @@ export const CatalogFilters = ({
 		setParam('car', next.join(','))
 	}
 
-	return (
-		<aside className='border-border bg-card sticky top-20 flex h-fit flex-col gap-5 rounded-2xl border p-5'>
+	// кількість активних фільтрів — для бейджа на мобільній кнопці
+	const activeCount =
+		selectedCars.length +
+		(sp.get('type') ? 1 : 0) +
+		(sp.get('condition') ? 1 : 0) +
+		(inStock ? 1 : 0) +
+		(activeCategory ? 1 : 0)
+
+	const content = (
+		<>
 			<Group label='Модель авто'>
 				<div className='flex flex-wrap gap-2'>
 					{cars.map(c => {
@@ -123,7 +145,74 @@ export const CatalogFilters = ({
 					))}
 				</ul>
 			</div>
-		</aside>
+		</>
+	)
+
+	return (
+		<>
+			{/* Десктоп — статичний сайдбар */}
+			<aside className='border-border bg-card sticky top-20 hidden h-fit flex-col gap-5 rounded-2xl border p-5 lg:flex'>
+				{content}
+			</aside>
+
+			{/* Мобайл — кнопка, що відкриває панель фільтрів */}
+			<button
+				type='button'
+				onClick={() => setOpen(true)}
+				className='border-border bg-card hover:bg-muted flex h-11 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-colors lg:hidden'
+			>
+				<SlidersHorizontal className='h-4 w-4' />
+				Фільтри
+				{activeCount > 0 && (
+					<span className='bg-primary text-primary-foreground flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold'>
+						{activeCount}
+					</span>
+				)}
+			</button>
+
+			{/* Мобайл — бекдроп */}
+			<div
+				aria-hidden
+				onClick={() => setOpen(false)}
+				className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 lg:hidden ${
+					open ? 'opacity-100' : 'pointer-events-none opacity-0'
+				}`}
+			/>
+
+			{/* Мобайл — панель */}
+			<aside
+				role='dialog'
+				aria-label='Фільтри'
+				aria-hidden={!open}
+				className={`bg-card fixed inset-y-0 left-0 z-50 flex w-full max-w-sm flex-col shadow-xl transition-transform duration-300 lg:hidden ${
+					open ? 'translate-x-0' : '-translate-x-full'
+				}`}
+			>
+				<div className='border-border flex h-16 shrink-0 items-center justify-between border-b px-5'>
+					<h2 className='font-display text-lg font-medium'>Фільтри</h2>
+					<button
+						type='button'
+						onClick={() => setOpen(false)}
+						aria-label='Закрити'
+						className='hover:bg-muted -mr-2 flex h-10 w-10 items-center justify-center rounded-xl'
+					>
+						<X className='h-5 w-5' />
+					</button>
+				</div>
+
+				<div className='flex flex-1 flex-col gap-5 overflow-y-auto p-5'>{content}</div>
+
+				<div className='border-border shrink-0 border-t p-5'>
+					<button
+						type='button'
+						onClick={() => setOpen(false)}
+						className='bg-primary text-primary-foreground flex h-12 w-full items-center justify-center rounded-xl text-sm font-bold transition-opacity hover:opacity-90'
+					>
+						Показати результати
+					</button>
+				</div>
+			</aside>
+		</>
 	)
 }
 

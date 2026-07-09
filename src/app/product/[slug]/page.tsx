@@ -150,14 +150,19 @@ export default async function ProductPage({ params }: Params) {
 			</nav>
 
 			<div className='grid items-start gap-10 pt-3.5 pb-10 lg:grid-cols-[1fr_440px]'>
-				{/* Ліва колонка: галерея + контент під фото */}
-				<div className='min-w-0'>
+				{/* Галерея — на мобайлі перша, на десктопі верх лівої колонки */}
+				<div className='min-w-0 lg:col-start-1 lg:row-start-1'>
 					<ProductGallery images={p.images} name={p.name} badges={galleryBadges} />
+				</div>
 
+				{/* Контент під фото: живі фото + опис/характеристики.
+				    Порядок у DOM = порядок на мобайлі (фото → блок купівлі → цей блок);
+				    на десктопі — низ лівої колонки */}
+				<div className='order-last flex min-w-0 flex-col gap-10 lg:order-none lg:col-start-1 lg:row-start-2'>
 					{/* Живі фото — реальні знімки екземпляра (перед описом; лише за наявності) */}
 					<LivePhotos photos={p.livePhotos ?? []} productName={p.name} />
 
-					<div className='border-border bg-card mt-10 flex flex-col gap-9 rounded-2xl border p-6 sm:p-8'>
+					<div className='border-border bg-card flex flex-col gap-9 rounded-2xl border p-6 sm:p-8'>
 						{p.descriptionHtml && (
 							<section>
 								<h2 className='mb-3.5 text-xl font-bold'>Опис</h2>
@@ -175,7 +180,7 @@ export default async function ProductPage({ params }: Params) {
 									<tbody>
 										{specs.map(([k, v, mono]) => (
 											<tr key={k} className='border-border border-b'>
-												<td className='text-muted-foreground w-60 py-3 pr-4 align-top text-sm'>
+												<td className='text-muted-foreground w-28 py-3 pr-4 align-top text-sm sm:w-60'>
 													{k}
 												</td>
 												<td
@@ -213,8 +218,10 @@ export default async function ProductPage({ params }: Params) {
 					</div>
 				</div>
 
-				{/* Права колонка: інфо + купівля (sticky) */}
-				<div className='lg:sticky lg:top-[84px]'>
+				{/* Права колонка: інфо + купівля. На мобайлі — одразу після фото
+				    (у DOM іде перед блоком опису, який зсунуто в кінець через order-last);
+				    на десктопі — права колонка, sticky на всю висоту лівої */}
+				<div className='lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start lg:sticky lg:top-[84px]'>
 					<div className='mb-3 flex flex-wrap items-center gap-1.5'>
 						<Badge variant='accent'>{CONDITION_LABEL[p.condition]}</Badge>
 						<Badge>{TYPE_LABEL[p.type]}</Badge>

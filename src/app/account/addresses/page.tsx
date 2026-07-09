@@ -1,13 +1,10 @@
 'use client'
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { ChevronLeft, MapPin, Pencil, Plus, Star, Trash2 } from 'lucide-react'
+import { MapPin, Pencil, Plus, Star, Trash2 } from 'lucide-react'
 import { useAuthStore } from '@/common/store/useAuthStore'
-import { UI_ROUTES } from '@/common/constants'
 import { addressesApi, type Address, type AddressPayload } from '@/common/services/addresses.api'
 import { AddressForm } from '@/common/components/account/AddressForm'
 import { FullScreenLoader } from '@/common/components'
@@ -18,18 +15,11 @@ const methodLabel = (m: Address['method']) =>
 // «new» — форма створення; string — id адреси, що редагується; null — список
 type Editing = 'new' | string | null
 
+// Гейт і навігація — в layout кабінету
 export default function AccountAddressesPage() {
-	const router = useRouter()
 	const user = useAuthStore(s => s.user)
-	const isAuthLoading = useAuthStore(s => s.isLoading)
 	const qc = useQueryClient()
 	const [editing, setEditing] = useState<Editing>(null)
-
-	useEffect(() => {
-		if (!isAuthLoading && !user) {
-			router.replace(`${UI_ROUTES.LOGIN}?next=${encodeURIComponent(UI_ROUTES.ACCOUNT_ADDRESSES)}`)
-		}
-	}, [isAuthLoading, user, router])
 
 	const { data, isPending, isError } = useQuery({
 		queryKey: ['account-addresses'],
@@ -71,20 +61,13 @@ export default function AccountAddressesPage() {
 		onSuccess: invalidate
 	})
 
-	if (isAuthLoading || !user) return <FullScreenLoader />
+	if (!user) return null
 
 	const addresses = data ?? []
 	const submitting = createMut.isPending || updateMut.isPending
 
 	return (
-		<main className='mx-auto max-w-[840px] px-6 py-10'>
-			<Link
-				href={UI_ROUTES.ACCOUNT}
-				className='text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1 text-sm'
-			>
-				<ChevronLeft className='h-4 w-4' />
-				Кабінет
-			</Link>
+		<>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<div>
 					<h1 className='font-display text-2xl font-bold'>Адреси доставки</h1>
@@ -138,10 +121,7 @@ export default function AccountAddressesPage() {
 				<ul className='mt-6 flex flex-col gap-4'>
 					{addresses.map(a =>
 						editing === a.id ? (
-							<li
-								key={a.id}
-								className='border-border bg-card rounded-2xl border p-6'
-							>
+							<li key={a.id} className='border-border bg-card rounded-2xl border p-6'>
 								<h2 className='font-display mb-4 text-lg font-bold'>
 									Редагування адреси
 								</h2>
@@ -167,7 +147,7 @@ export default function AccountAddressesPage() {
 					)}
 				</ul>
 			)}
-		</main>
+		</>
 	)
 }
 

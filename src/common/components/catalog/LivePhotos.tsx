@@ -17,7 +17,7 @@ export const LivePhotos = ({ photos, productName }: { photos: CatalogImage[]; pr
 	const next = () => setActive(a => (a === null ? a : (a + 1) % photos.length))
 
 	return (
-		<section className='mt-10 rounded-2xl border border-amber-200 bg-amber-50/50 p-5 sm:p-6 dark:border-amber-900 dark:bg-amber-800/60'>
+		<section className='rounded-2xl border border-amber-200 bg-amber-50/50 p-5 sm:p-6 dark:border-amber-900 dark:bg-amber-800/60'>
 			<div className='flex flex-wrap items-center gap-3'>
 				<span className='bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-xl'>
 					<Camera className='h-5 w-5' />
