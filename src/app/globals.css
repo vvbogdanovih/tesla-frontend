@@ -130,3 +130,16 @@ input:-webkit-autofill:active {
 	color: var(--muted-foreground);
 	margin: 0.75rem 0;
 }
+
+/* Поважаємо prefers-reduced-motion: глушимо transition/animation.
+   Спінери стануть статичними — поруч завжди є текстовий стан. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

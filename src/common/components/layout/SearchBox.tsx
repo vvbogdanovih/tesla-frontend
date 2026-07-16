@@ -25,15 +25,11 @@ export const SearchBox = ({
 	const [open, setOpen] = useState(false)
 	const [loading, setLoading] = useState(false)
 
-	// debounced автодоповнення (pg_trgm)
+	// debounced автодоповнення (pg_trgm); синхронні оновлення items/loading
+	// живуть в onChange інпута — в ефекті лишився тільки таймер із фетчем
 	useEffect(() => {
 		const term = q.trim()
-		if (term.length < 2) {
-			setItems([])
-			setLoading(false)
-			return
-		}
-		setLoading(true)
+		if (term.length < 2) return
 		const t = setTimeout(async () => {
 			try {
 				const res = await fetch(
@@ -85,8 +81,15 @@ export const SearchBox = ({
 				<input
 					value={q}
 					onChange={e => {
-						setQ(e.target.value)
+						const value = e.target.value
+						setQ(value)
 						setOpen(true)
+						if (value.trim().length < 2) {
+							setItems([])
+							setLoading(false)
+						} else {
+							setLoading(true)
+						}
 					}}
 					onFocus={() => setOpen(true)}
 					placeholder='Пошук за назвою або артикулом…'
@@ -97,7 +100,9 @@ export const SearchBox = ({
 							: 'text-foreground placeholder:text-muted-foreground')
 					}
 				/>
-				{loading && <Loader2 className='text-muted-foreground h-4 w-4 shrink-0 animate-spin' />}
+				{loading && (
+					<Loader2 className='text-muted-foreground h-4 w-4 shrink-0 animate-spin' />
+				)}
 			</form>
 
 			{open && term.length >= 2 && (
@@ -127,10 +132,16 @@ export const SearchBox = ({
 										)}
 									</div>
 									<div className='min-w-0 flex-1'>
-										<div className='truncate text-sm font-medium'>{it.name}</div>
-										<div className='text-muted-foreground font-mono text-xs'>{it.sku}</div>
+										<div className='truncate text-sm font-medium'>
+											{it.name}
+										</div>
+										<div className='text-muted-foreground font-mono text-xs'>
+											{it.sku}
+										</div>
 									</div>
-									<div className='shrink-0 text-sm font-semibold'>{formatMoney(it.price)}</div>
+									<div className='shrink-0 text-sm font-semibold'>
+										{formatMoney(it.price)}
+									</div>
 								</Link>
 							))}
 							<button

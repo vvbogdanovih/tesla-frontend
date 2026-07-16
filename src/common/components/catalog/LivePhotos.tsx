@@ -4,11 +4,18 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Camera, Check, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import type { CatalogImage } from '@/common/types'
+import { thumbSrc } from '@/common/utils/image'
 
 // «Живі фото товару» — акцентна смуга-довіри між галереєю та описом (FRD §3.4).
 // Реальні знімки саме цього екземпляра; окремий блок, щоб не зливатися зі студійною галереєю.
 // Рендериться лише за наявності фото (інакше для користувача блок відсутній).
-export const LivePhotos = ({ photos, productName }: { photos: CatalogImage[]; productName: string }) => {
+export const LivePhotos = ({
+	photos,
+	productName
+}: {
+	photos: CatalogImage[]
+	productName: string
+}) => {
 	const [active, setActive] = useState<number | null>(null)
 	if (!photos.length) return null
 
@@ -40,14 +47,15 @@ export const LivePhotos = ({ photos, productName }: { photos: CatalogImage[]; pr
 						aria-label={`Відкрити живе фото ${i + 1}`}
 						className='group border-border bg-muted relative aspect-[4/3] w-40 shrink-0 cursor-zoom-in snap-start overflow-hidden rounded-xl border shadow-sm'
 					>
+						{/* стрічка — мініатюри; лайтбокс нижче відкриває повний url */}
 						<Image
-							src={p.url}
+							src={thumbSrc(p)}
 							alt={alt(i)}
 							fill
 							sizes='160px'
 							className='object-cover transition-transform duration-300 group-hover:scale-105'
 						/>
-						<span className='absolute bottom-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-md bg-black/55 text-white'>
+						<span className='absolute right-1.5 bottom-1.5 flex h-5 w-5 items-center justify-center rounded-md bg-black/55 text-white'>
 							<Camera className='h-3 w-3' />
 						</span>
 					</button>
@@ -64,7 +72,7 @@ export const LivePhotos = ({ photos, productName }: { photos: CatalogImage[]; pr
 					<button
 						type='button'
 						aria-label='Закрити'
-						className='absolute right-4 top-4 rounded-lg bg-white/10 p-2 text-white hover:bg-white/20'
+						className='absolute top-4 right-4 rounded-lg bg-white/10 p-2 text-white hover:bg-white/20'
 						onClick={() => setActive(null)}
 					>
 						<X className='h-5 w-5' />
@@ -86,7 +94,7 @@ export const LivePhotos = ({ photos, productName }: { photos: CatalogImage[]; pr
 							<button
 								type='button'
 								aria-label='Наступне фото'
-								className='absolute right-4 top-1/2 -translate-y-1/2 rounded-lg bg-white/10 p-2 text-white hover:bg-white/20'
+								className='absolute top-1/2 right-4 -translate-y-1/2 rounded-lg bg-white/10 p-2 text-white hover:bg-white/20'
 								onClick={e => {
 									e.stopPropagation()
 									next()
@@ -101,7 +109,13 @@ export const LivePhotos = ({ photos, productName }: { photos: CatalogImage[]; pr
 						className='relative h-full max-h-[85vh] w-full max-w-4xl'
 						onClick={e => e.stopPropagation()}
 					>
-						<Image src={photos[active].url} alt={alt(active)} fill sizes='100vw' className='object-contain' />
+						<Image
+							src={photos[active].url}
+							alt={alt(active)}
+							fill
+							sizes='100vw'
+							className='object-contain'
+						/>
 					</div>
 				</div>
 			)}

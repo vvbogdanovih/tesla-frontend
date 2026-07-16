@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { Heart, X } from 'lucide-react'
+import { Heart } from 'lucide-react'
+import { Modal } from '@/common/components/ui/Modal'
 import { UI_ROUTES } from '@/common/constants/ui-routes.constants'
 
 interface Props {
@@ -24,37 +24,9 @@ export const LoginGateModal = ({
 	const pathname = usePathname()
 	const next = encodeURIComponent(pathname || UI_ROUTES.HOME)
 
-	useEffect(() => {
-		if (!open) return
-		document.body.style.overflow = 'hidden'
-		const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-		window.addEventListener('keydown', onKey)
-		return () => {
-			document.body.style.overflow = ''
-			window.removeEventListener('keydown', onKey)
-		}
-	}, [open, onClose])
-
-	if (!open) return null
-
 	return (
-		<div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
-			<div aria-hidden className='absolute inset-0 bg-black/50' onClick={onClose} />
-			<div
-				role='dialog'
-				aria-modal='true'
-				aria-label={title}
-				className='bg-card border-border text-foreground relative z-10 w-full max-w-sm rounded-2xl border p-6 text-center shadow-xl'
-			>
-				<button
-					type='button'
-					onClick={onClose}
-					aria-label='Закрити'
-					className='hover:bg-muted absolute top-3 right-3 rounded-md p-1'
-				>
-					<X className='h-5 w-5' />
-				</button>
-
+		<Modal open={open} onClose={onClose} ariaLabel={title} maxWidthClassName='max-w-sm'>
+			<div className='text-center'>
 				<div className='bg-muted mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full'>
 					<Heart className='text-accent-text h-6 w-6' />
 				</div>
@@ -79,6 +51,6 @@ export const LoginGateModal = ({
 					</Link>
 				</div>
 			</div>
-		</div>
+		</Modal>
 	)
 }

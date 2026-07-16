@@ -13,8 +13,24 @@ interface Props {
 }
 
 const SIZES = {
-	sm: { h: 'h-9', btn: 'w-9', icon: 'h-3.5 w-3.5', input: 'w-7', round: 'rounded-lg', rl: 'rounded-l-lg', rr: 'rounded-r-lg' },
-	md: { h: 'h-11', btn: 'w-11', icon: 'h-4 w-4', input: 'w-10', round: 'rounded-xl', rl: 'rounded-l-xl', rr: 'rounded-r-xl' }
+	sm: {
+		h: 'h-9',
+		btn: 'w-9',
+		icon: 'h-3.5 w-3.5',
+		input: 'w-7',
+		round: 'rounded-lg',
+		rl: 'rounded-l-lg',
+		rr: 'rounded-r-lg'
+	},
+	md: {
+		h: 'h-11',
+		btn: 'w-11',
+		icon: 'h-4 w-4',
+		input: 'w-10',
+		round: 'rounded-xl',
+		rl: 'rounded-l-xl',
+		rr: 'rounded-r-xl'
+	}
 } as const
 
 export const QtyStepper = ({ qty, stockQty, onSet, size = 'md', block, className }: Props) => {
@@ -22,7 +38,14 @@ export const QtyStepper = ({ qty, stockQty, onSet, size = 'md', block, className
 	const [warn, setWarn] = useState<string | null>(null)
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-	useEffect(() => setDraft(String(qty)), [qty])
+	// синхронізація драфта зі значенням зі store — під час рендера, без ефекту
+	// (патерн «adjusting state when a prop changes» з react.dev)
+	const [prevQty, setPrevQty] = useState(qty)
+	if (prevQty !== qty) {
+		setPrevQty(qty)
+		setDraft(String(qty))
+	}
+
 	useEffect(() => () => void (timer.current && clearTimeout(timer.current)), [])
 
 	const s = SIZES[size]
@@ -89,7 +112,7 @@ export const QtyStepper = ({ qty, stockQty, onSet, size = 'md', block, className
 				</button>
 			</div>
 			{warn && (
-				<p className='absolute left-0 top-full mt-1 whitespace-nowrap text-xs font-medium text-red-500'>
+				<p className='absolute top-full left-0 mt-1 text-xs font-medium whitespace-nowrap text-red-500'>
 					{warn}
 				</p>
 			)}

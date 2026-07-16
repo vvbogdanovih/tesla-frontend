@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Camera, ImageOff } from 'lucide-react'
 import { UI_ROUTES } from '@/common/constants'
 import { CONDITION_LABEL, TYPE_LABEL, discountPercent, formatMoney } from '@/common/utils/format'
+import { thumbSrc } from '@/common/utils/image'
 import { AddToCart } from './AddToCart'
 import { WishlistButton } from './WishlistButton'
 import type { CatalogProduct } from '@/common/types'
@@ -24,7 +25,7 @@ export const ProductCard = ({ product: p }: { product: CatalogProduct }) => {
 				<div className='bg-muted relative aspect-square w-full overflow-hidden rounded-xl'>
 					{img ? (
 						<Image
-							src={img.url}
+							src={thumbSrc(img)}
 							alt={img.alt ?? p.name}
 							fill
 							sizes='(max-width:640px) 50vw, (max-width:1024px) 33vw, 300px'
@@ -79,7 +80,7 @@ export const ProductCard = ({ product: p }: { product: CatalogProduct }) => {
 							name: p.name,
 							sku: p.sku,
 							price: Number(p.price),
-							image: img?.url ?? null,
+							image: img ? thumbSrc(img) : null,
 							stockQty: p.stockQty
 						}}
 					/>

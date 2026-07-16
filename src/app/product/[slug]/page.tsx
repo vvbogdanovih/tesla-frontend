@@ -14,7 +14,21 @@ import { WishlistButton } from '@/common/components/catalog/WishlistButton'
 import { CopySku } from '@/common/components/catalog/CopySku'
 import { SITE_URL, UI_ROUTES } from '@/common/constants'
 import type { CatalogProduct } from '@/common/types'
-import { CONDITION_LABEL, TYPE_LABEL, discountPercent, formatMoney } from '@/common/utils/format'
+import {
+	CONDITION_LABEL,
+	TYPE_LABEL,
+	discountPercent,
+	formatMoney,
+	stripHtml
+} from '@/common/utils/format'
+import { thumbSrc } from '@/common/utils/image'
+
+// Мапінг стану товару на схему schema.org (уцінка = новий з дефектом)
+const CONDITION_SCHEMA: Record<string, string> = {
+	new: 'https://schema.org/NewCondition',
+	used: 'https://schema.org/UsedCondition',
+	clearance: 'https://schema.org/DamagedCondition'
+}
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -85,13 +99,25 @@ export default async function ProductPage({ params }: Params) {
 		'@type': 'Product',
 		name: p.name,
 		sku: p.sku,
+		description:
+			p.seo?.description ||
+			(p.descriptionHtml
+				? stripHtml(p.descriptionHtml).slice(0, 300)
+				: `${p.name} — артикул ${p.sku}. Запчастина Tesla.`),
 		image: [...p.images, ...(p.livePhotos ?? [])].map(i => i.url),
 		category: p.category?.name,
+		itemCondition: CONDITION_SCHEMA[p.condition],
+		// Бренд — лише для оригіналів; для аналогів виробник невідомий
+		...(p.type === 'original' ? { brand: { '@type': 'Brand', name: 'Tesla' } } : {}),
 		offers: {
 			'@type': 'Offer',
 			price: Number(p.price),
 			priceCurrency: 'UAH',
 			availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+			itemCondition: CONDITION_SCHEMA[p.condition],
+			// Ковзна дата +30 діб — ISR тримає її свіжою; server component, кожна регенерація — новий рендер
+			// eslint-disable-next-line react-hooks/purity
+			priceValidUntil: new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10),
 			url: productUrl
 		}
 	}
@@ -221,7 +247,7 @@ export default async function ProductPage({ params }: Params) {
 				{/* Права колонка: інфо + купівля. На мобайлі — одразу після фото
 				    (у DOM іде перед блоком опису, який зсунуто в кінець через order-last);
 				    на десктопі — права колонка, sticky на всю висоту лівої */}
-				<div className='lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start lg:sticky lg:top-[84px]'>
+				<div className='lg:sticky lg:top-[84px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start'>
 					<div className='mb-3 flex flex-wrap items-center gap-1.5'>
 						<Badge variant='accent'>{CONDITION_LABEL[p.condition]}</Badge>
 						<Badge>{TYPE_LABEL[p.type]}</Badge>
@@ -308,7 +334,7 @@ export default async function ProductPage({ params }: Params) {
 											name: p.name,
 											sku: p.sku,
 											price: Number(p.price),
-											image: p.images[0]?.url ?? null,
+											image: p.images[0] ? thumbSrc(p.images[0]) : null,
 											stockQty: p.stockQty
 										}}
 									/>

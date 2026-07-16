@@ -16,8 +16,8 @@ export const PasswordForm = ({ onClose }: { onClose: () => void }) => {
 	const [submitting, setSubmitting] = useState(false)
 
 	const submit = async () => {
-		if (next.length < 6) {
-			setError('Новий пароль має містити щонайменше 6 символів')
+		if (next.length < 8) {
+			setError('Новий пароль має містити щонайменше 8 символів')
 			return
 		}
 		if (next !== repeat) {

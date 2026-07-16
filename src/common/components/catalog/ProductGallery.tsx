@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { ImageOff } from 'lucide-react'
 import type { CatalogImage } from '@/common/types'
+import { thumbSrc } from '@/common/utils/image'
 
 export const ProductGallery = ({
 	images,
@@ -28,9 +29,11 @@ export const ProductGallery = ({
 
 	return (
 		<div className='flex flex-col gap-3'>
-			<div className='bg-white shadow-2xl relative aspect-square w-full overflow-hidden rounded-2xl'>
+			<div className='relative aspect-square w-full overflow-hidden rounded-2xl bg-white shadow-2xl'>
 				{badges && (
-					<div className='absolute left-3.5 top-3.5 z-10 flex flex-wrap gap-1.5'>{badges}</div>
+					<div className='absolute top-3.5 left-3.5 z-10 flex flex-wrap gap-1.5'>
+						{badges}
+					</div>
 				)}
 				<Image
 					src={main.url}
@@ -53,8 +56,9 @@ export const ProductGallery = ({
 								(i === active ? 'border-primary' : 'border-transparent')
 							}
 						>
+							{/* мініатюри — 400px-варіант; головне фото вище лишається повним url */}
 							<Image
-								src={img.url}
+								src={thumbSrc(img)}
 								alt={img.alt ?? `${name} ${i + 1}`}
 								fill
 								sizes='64px'

@@ -7,6 +7,7 @@ import { ImageOff, Loader2 } from 'lucide-react'
 import { catalogApi } from '@/common/services/catalog.api'
 import { UI_ROUTES } from '@/common/constants'
 import { CONDITION_LABEL, TYPE_LABEL, discountPercent, formatMoney } from '@/common/utils/format'
+import { thumbSrc } from '@/common/utils/image'
 import type { CartProduct } from '@/common/store/useCartStore'
 import type { CatalogProduct, CatalogResponse } from '@/common/types'
 import { AddToCart } from './AddToCart'
@@ -24,7 +25,7 @@ const toCartProduct = (p: CatalogProduct): CartProduct => ({
 	name: p.name,
 	sku: p.sku,
 	price: Number(p.price),
-	image: p.images[0]?.url ?? null,
+	image: p.images[0] ? thumbSrc(p.images[0]) : null,
 	stockQty: p.stockQty
 })
 
@@ -158,7 +159,7 @@ const Thumb = ({ p, size }: { p: CatalogProduct; size: number }) => {
 		>
 			{img ? (
 				<Image
-					src={img.url}
+					src={thumbSrc(img)}
 					alt={img.alt ?? p.name}
 					fill
 					sizes={`${size}px`}
@@ -195,7 +196,7 @@ const Row = ({ p }: { p: CatalogProduct }) => {
 					<div className='pointer-events-none absolute top-1/2 left-14 z-30 -translate-y-1/2 scale-90 opacity-0 transition-all duration-150 group-hover:scale-100 group-hover:opacity-100'>
 						<div className='border-border bg-card relative h-72 w-72 overflow-hidden rounded-xl border shadow-2xl'>
 							<Image
-								src={img.url}
+								src={thumbSrc(img)}
 								alt={img.alt ?? p.name}
 								fill
 								sizes='288px'

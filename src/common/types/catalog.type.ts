@@ -3,6 +3,8 @@ export type ProductCondition = 'new' | 'used' | 'clearance'
 
 export interface CatalogImage {
 	url: string
+	// мініатюра 400px (`<uuid>_w400.avif`, ADR-0007); nullable — старі записи можуть не мати
+	thumbUrl?: string | null
 	alt: string | null
 }
 

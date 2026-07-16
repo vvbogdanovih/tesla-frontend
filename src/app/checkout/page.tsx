@@ -5,13 +5,12 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { Loader2, MapPin, Plus, UserCheck } from 'lucide-react'
 import { UI_ROUTES } from '@/common/constants'
 import { formatMoney } from '@/common/utils/format'
-import { cleanPhone, normalizePhone } from '@/common/utils/phone'
+import { normalizePhone } from '@/common/utils/phone'
 import { useAuthStore } from '@/common/store/useAuthStore'
 import { useCartStore, useCartTotal } from '@/common/store/useCartStore'
 import { ordersApi, stashLastOrder, type CreateOrderPayload } from '@/common/services/orders.api'
@@ -20,62 +19,11 @@ import { AuthField, authInputClass } from '@/common/components/auth/parts'
 import { IbanRequisites } from '@/common/components/checkout/IbanRequisites'
 import { NpDeliveryPicker } from '@/common/components/checkout/NpDeliveryPicker'
 import { UpDeliveryFields } from '@/common/components/checkout/UpDeliveryFields'
-
-const schema = z
-	.object({
-		name: z.string().trim().min(2, 'Вкажіть ПІБ (мінімум 2 символи)'),
-		phone: z
-			.string()
-			.trim()
-			.min(1, 'Вкажіть телефон')
-			.refine(v => /^(\+?380|0)\d{9}$/.test(cleanPhone(v)), 'Формат: +380 XX XXX XX XX'),
-		email: z.string().trim().email('Некоректний email').optional().or(z.literal('')),
-		delivery: z.enum(['np', 'ukrposhta', 'pickup']),
-		city: z.string().trim().optional(),
-		warehouse: z.string().trim().optional(),
-		// Nova Poshta — обрані з довідника (ADR-0014)
-		cityRef: z.string().optional(),
-		warehouseRef: z.string().optional(),
-		warehouseType: z.enum(['branch', 'postomat', 'cargo']).optional(),
-		paymentMethod: z.enum(['cod', 'iban', 'cash', 'card']),
-		comment: z.string().trim().max(1000, 'Занадто довгий коментар').optional()
-	})
-	.superRefine((values, ctx) => {
-		if (values.delivery === 'np') {
-			// НП — обовʼязково вибір із довідника (є ref), а не довільний текст
-			if (!values.cityRef) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					path: ['city'],
-					message: 'Оберіть місто зі списку'
-				})
-			}
-			if (!values.warehouseRef) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					path: ['warehouse'],
-					message: 'Оберіть відділення або поштомат'
-				})
-			}
-		} else if (values.delivery === 'ukrposhta') {
-			if (!values.city) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					path: ['city'],
-					message: 'Вкажіть місто'
-				})
-			}
-			if (!values.warehouse) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					path: ['warehouse'],
-					message: 'Вкажіть відділення'
-				})
-			}
-		}
-	})
-
-type FormValues = z.infer<typeof schema>
+// схему винесено в checkout.schema.ts — щоб тестувати без jsdom (F6)
+import {
+	checkoutSchema,
+	type CheckoutFormValues as FormValues
+} from '@/common/components/checkout/checkout.schema'
 
 export default function CheckoutPage() {
 	// react-hook-form v7 несумісний із React Compiler (мемоізація ламає
@@ -119,7 +67,7 @@ export default function CheckoutPage() {
 		reset,
 		formState: { errors, isSubmitting, isDirty, isSubmitted }
 	} = useForm<FormValues>({
-		resolver: zodResolver(schema),
+		resolver: zodResolver(checkoutSchema),
 		defaultValues: {
 			name: '',
 			phone: '',

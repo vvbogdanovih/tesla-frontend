@@ -57,10 +57,6 @@ export const API_URLS = {
 		PRICE_MATCH: `/leads/price-match`,
 		PRICE_SUBSCRIBE: `/leads/price-subscribe`
 	},
-	BLOG: {
-		BASE: `/blog`,
-		BY_SLUG: (slug: string) => `/blog/${slug}`
-	},
 	NOVA_POSHTA: {
 		CITIES: `/delivery/np/cities`,
 		WAREHOUSES: `/delivery/np/warehouses`

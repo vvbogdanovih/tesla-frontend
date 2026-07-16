@@ -64,6 +64,8 @@ const AsyncSelect = ({
 	const skip = useRef(false) // не перезапускати пошук одразу після вибору
 	const box = useRef<HTMLDivElement>(null)
 
+	// синхронні оновлення items/loading живуть в onChange інпута —
+	// в ефекті лишився тільки debounce-таймер із фетчем
 	useEffect(() => {
 		if (disabled) return
 		if (skip.current) {
@@ -71,12 +73,7 @@ const AsyncSelect = ({
 			return
 		}
 		const term = q.trim()
-		if (term.length < minChars) {
-			setItems([])
-			setLoading(false)
-			return
-		}
-		setLoading(true)
+		if (term.length < minChars) return
 		const t = setTimeout(async () => {
 			try {
 				const res = await fetcher(term)
@@ -114,7 +111,16 @@ const AsyncSelect = ({
 					placeholder={placeholder}
 					disabled={disabled}
 					value={q}
-					onChange={e => setQ(e.target.value)}
+					onChange={e => {
+						const value = e.target.value
+						setQ(value)
+						if (value.trim().length < minChars) {
+							setItems([])
+							setLoading(false)
+						} else {
+							setLoading(true)
+						}
+					}}
 					onFocus={() => items.length && setOpen(true)}
 					autoComplete='off'
 				/>

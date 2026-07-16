@@ -4,6 +4,7 @@ import { ArrowRight, Car as CarIcon, Search, ShieldCheck, Truck, Package } from 
 import { catalogApi } from '@/common/services/catalog.api'
 import { ProductCard } from '@/common/components/catalog/ProductCard'
 import { SearchBox } from '@/common/components/layout/SearchBox'
+import { HeroVideo } from '@/common/components/layout/HeroVideo'
 import { LeadButton } from '@/common/components/catalog/LeadButton'
 import { UI_ROUTES } from '@/common/constants'
 import type { Car } from '@/common/types'
@@ -22,6 +23,10 @@ export default async function Home() {
 
 	const carLabel = (c: Car) => c.generation ?? c.brand
 
+	// Кількість позицій — з реальних даних каталогу (округлено вниз до сотні), фолбек на «1000+»
+	const positionsLabel =
+		featured.total >= 100 ? `${Math.floor(featured.total / 100) * 100}+` : '1000+'
+
 	return (
 		<>
 			{/* Hero */}
@@ -34,21 +39,7 @@ export default async function Home() {
 							'radial-gradient(900px 520px at 84% -12%, rgba(245,158,11,.46), transparent 60%)'
 					}}
 				/>
-				<video
-					aria-hidden
-					autoPlay
-					muted
-					loop
-					playsInline
-					poster='/hero.jpg'
-					className='pointer-events-none absolute inset-y-0 right-0 z-0 hidden h-full w-[66%] object-cover object-right md:block'
-					style={{
-						WebkitMaskImage: 'linear-gradient(90deg,transparent 0%,#000 42%,#000 100%)',
-						maskImage: 'linear-gradient(90deg,transparent 0%,#000 42%,#000 100%)'
-					}}
-				>
-					<source src='/hero.mp4' type='video/mp4' />
-				</video>
+				<HeroVideo />
 				<div
 					aria-hidden
 					className='pointer-events-none absolute inset-0 z-0'
@@ -66,7 +57,8 @@ export default async function Home() {
 						Знайди потрібну деталь за хвилину
 					</h1>
 					<p className='mb-6 max-w-xl text-lg text-zinc-400'>
-						Понад 1000 оригінальних та аналогових запчастин для Model 3 · Y · S · X.
+						Понад {positionsLabel.replace('+', '')} оригінальних та аналогових запчастин
+						для Model 3 · Y · S · X.
 					</p>
 
 					<div className='mb-7'>
@@ -90,14 +82,16 @@ export default async function Home() {
 
 					<div className='flex flex-wrap gap-10'>
 						{[
-							['1000+', 'позицій'],
+							[positionsLabel, 'позицій'],
 							[`${cars.length}`, 'моделей'],
 							['Оригінал & аналог', 'на вибір'],
 							['Доставка', 'по Україні']
 						].map(([n, l]) => (
 							<div key={l}>
 								<div className='text-2xl font-extrabold'>{n}</div>
-								<div className='mt-1 text-xs tracking-wide text-zinc-500 uppercase'>{l}</div>
+								<div className='mt-1 text-xs tracking-wide text-zinc-500 uppercase'>
+									{l}
+								</div>
 							</div>
 						))}
 					</div>
@@ -116,7 +110,13 @@ export default async function Home() {
 						>
 							<div className='bg-muted relative aspect-[16/9] w-full'>
 								{c.imageUrl ? (
-									<Image src={c.imageUrl} alt={c.model} fill sizes='400px' className='object-cover' />
+									<Image
+										src={c.imageUrl}
+										alt={c.model}
+										fill
+										sizes='400px'
+										className='object-cover'
+									/>
 								) : (
 									<CarIcon className='text-muted-foreground absolute inset-0 m-auto h-8 w-8' />
 								)}
@@ -124,7 +124,9 @@ export default async function Home() {
 							<div className='flex items-center justify-between p-4'>
 								<div>
 									<div className='font-bold'>{c.model}</div>
-									<div className='text-muted-foreground text-sm'>{carLabel(c)}</div>
+									<div className='text-muted-foreground text-sm'>
+										{carLabel(c)}
+									</div>
 								</div>
 								<ArrowRight className='text-accent-text h-5 w-5 transition-transform group-hover:translate-x-1' />
 							</div>
@@ -137,10 +139,26 @@ export default async function Home() {
 			<section className={`${CONTAINER} pb-14`}>
 				<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
 					{[
-						{ icon: Package, t: '1000+ позицій', d: 'Під усі популярні моделі Tesla.' },
-						{ icon: Search, t: 'Швидкий пошук', d: 'За кодом запчастини, назвою та VIN.' },
-						{ icon: Truck, t: 'Доставка', d: 'Нова Пошта та Укрпошта — в день замовлення.' },
-						{ icon: ShieldCheck, t: 'Гарантія', d: 'Гарантія на товар і повернення 14 днів.' }
+						{
+							icon: Package,
+							t: `${positionsLabel} позицій`,
+							d: 'Під усі популярні моделі Tesla.'
+						},
+						{
+							icon: Search,
+							t: 'Швидкий пошук',
+							d: 'За кодом запчастини, назвою та VIN.'
+						},
+						{
+							icon: Truck,
+							t: 'Доставка',
+							d: 'Нова Пошта та Укрпошта — в день замовлення.'
+						},
+						{
+							icon: ShieldCheck,
+							t: 'Гарантія',
+							d: 'Гарантія на товар і повернення 14 днів.'
+						}
 					].map(b => (
 						<div key={b.t} className='border-border bg-card rounded-2xl border p-5'>
 							<div className='bg-primary/10 text-accent-text mb-3 flex h-11 w-11 items-center justify-center rounded-xl'>

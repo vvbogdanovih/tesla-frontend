@@ -19,7 +19,7 @@ const schema = z
 		lastName: z.string().optional(),
 		email: z.string().email('Некоректний email'),
 		phone: z.string().optional(),
-		password: z.string().min(6, 'Пароль має містити щонайменше 6 символів'),
+		password: z.string().min(8, 'Пароль має містити щонайменше 8 символів'),
 		confirmPassword: z.string().min(1, 'Підтвердіть пароль')
 	})
 	.refine(data => data.password === data.confirmPassword, {

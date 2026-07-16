@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
 	images: {
 		// Віддаємо S3-зображення як є (без ре-оптимізації на сервері), щоб не
 		// навантажувати VPS. Hostname онови під реальний бакет.
+		// Мініатюри для карток/стрічок — готовий 400px-варіант `<uuid>_w400.avif`
+		// з бекенда (ADR-0007), фронт бере його через utils/image.ts:thumbSrc.
 		unoptimized: true,
 		remotePatterns: [
 			{ protocol: 'https', hostname: '*.amazonaws.com' },
