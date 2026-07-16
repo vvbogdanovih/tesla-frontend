@@ -1,13 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Heart } from 'lucide-react'
-import { useAuthStore } from '@/common/store/useAuthStore'
 import { UI_ROUTES } from '@/common/constants'
 import { useWishlist } from '@/common/hooks/useWishlist'
 import { ProductCard } from '@/common/components/catalog/ProductCard'
+import { AccountShell } from '@/common/components/account/AccountShell'
 import { FullScreenLoader } from '@/common/components'
 
 // «товар / товари / товарів»
@@ -19,26 +17,21 @@ const pluralItems = (n: number) => {
 	return 'товарів'
 }
 
+// Обране живе поза /account, тож каркас кабінету (гейт + сайдбар) — через AccountShell
 export default function WishlistPage() {
-	const router = useRouter()
-	const user = useAuthStore(s => s.user)
-	const isAuthLoading = useAuthStore(s => s.isLoading)
+	return (
+		<AccountShell>
+			<WishlistContent />
+		</AccountShell>
+	)
+}
 
-	// Гейт: неавторизованих ведемо на вхід із поверненням у обране (ADR-0012).
-	useEffect(() => {
-		if (!isAuthLoading && !user) {
-			router.replace(`${UI_ROUTES.LOGIN}?next=${encodeURIComponent(UI_ROUTES.WISHLIST)}`)
-		}
-	}, [isAuthLoading, user, router])
-
+const WishlistContent = () => {
 	const { data, isPending, isError } = useWishlist()
-
-	if (isAuthLoading || !user) return <FullScreenLoader />
-
 	const items = data ?? []
 
 	return (
-		<main className='mx-auto max-w-[1240px] px-6 py-10'>
+		<>
 			<h1 className='font-display text-2xl font-bold'>Обране</h1>
 			<p className='text-muted-foreground mt-1 text-sm'>
 				{items.length > 0
@@ -55,7 +48,7 @@ export default function WishlistPage() {
 					Не вдалося завантажити обране. Спробуйте оновити сторінку.
 				</p>
 			) : items.length === 0 ? (
-				<div className='border-border bg-card mt-8 flex flex-col items-center rounded-2xl border px-6 py-16 text-center'>
+				<div className='border-border bg-card mt-6 flex flex-col items-center rounded-2xl border px-6 py-16 text-center'>
 					<div className='bg-muted mb-4 grid h-16 w-16 place-items-center rounded-full'>
 						<Heart className='text-muted-foreground h-8 w-8' />
 					</div>
@@ -71,12 +64,12 @@ export default function WishlistPage() {
 					</Link>
 				</div>
 			) : (
-				<div className='mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4'>
+				<div className='mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4'>
 					{items.map(p => (
 						<ProductCard key={p.id} product={p} />
 					))}
 				</div>
 			)}
-		</main>
+		</>
 	)
 }
