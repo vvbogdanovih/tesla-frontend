@@ -230,12 +230,12 @@ export default function CheckoutPage() {
 			setPlaced(true)
 			clear()
 			// Онлайн-оплата: бекенд повернув посилання на monopay — ведемо на оплату.
-			// Після оплати monopay поверне на /order/{n}/success (redirectUrl інвойсу).
+			// Після оплати monopay поверне на /order/{publicId}/success (redirectUrl інвойсу).
 			if (order.paymentUrl) {
 				window.location.assign(order.paymentUrl)
 				return
 			}
-			router.replace(`/order/${encodeURIComponent(order.orderNumber)}/success`)
+			router.replace(`/order/${encodeURIComponent(order.publicId)}/success`)
 		} catch (err) {
 			// 400/409 (нестача залишків тощо) — українське повідомлення з бекенда; кошик не чистимо
 			toast.error((err as Error)?.message || 'Не вдалося оформити замовлення')

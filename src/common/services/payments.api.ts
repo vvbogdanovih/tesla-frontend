@@ -17,17 +17,17 @@ export type PaymentStatusResult = z.infer<typeof paymentStatusSchema>
 
 export const paymentsApi = {
 	// Створити/повторити інвойс; повертає pageUrl для редіректу на оплату
-	createInvoice: (orderNumber: string) =>
-		httpService.post<InvoiceResult, { orderNumber: string }>(
+	createInvoice: (publicId: string) =>
+		httpService.post<InvoiceResult, { publicId: string }>(
 			API_URLS.PAYMENTS.MONOPAY_INVOICE,
-			{ orderNumber },
+			{ publicId },
 			{ schema: invoiceResultSchema }
 		),
 
 	// Звірити статус оплати (fallback до вебхука)
-	status: (orderNumber: string) =>
+	status: (publicId: string) =>
 		httpService.get<PaymentStatusResult>(
-			API_URLS.PAYMENTS.MONOPAY_STATUS(encodeURIComponent(orderNumber)),
+			API_URLS.PAYMENTS.MONOPAY_STATUS(encodeURIComponent(publicId)),
 			{ schema: paymentStatusSchema, skipErrorToast: true }
 		)
 }

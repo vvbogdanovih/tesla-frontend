@@ -33,6 +33,7 @@ const paymentSchema = z.object({
 export const orderSchema = z.object({
 	id: z.string(),
 	orderNumber: z.string(),
+	publicId: z.string(),
 	status: z.string(),
 	total: z.string(),
 	createdAt: z.string(),
@@ -108,8 +109,8 @@ export const ordersApi = {
 			skipErrorToast: true
 		}),
 
-	byNumber: (number: string) =>
-		httpService.get<OrderSummary>(API_URLS.ORDERS.BY_NUMBER(encodeURIComponent(number)), {
+	byPublicId: (publicId: string) =>
+		httpService.get<OrderSummary>(API_URLS.ORDERS.BY_PUBLIC_ID(encodeURIComponent(publicId)), {
 			schema: orderSummarySchema,
 			skipErrorToast: true
 		}),
@@ -139,12 +140,12 @@ export const stashLastOrder = (order: Order) => {
 	}
 }
 
-export const readLastOrder = (orderNumber: string): Order | null => {
+export const readLastOrder = (publicId: string): Order | null => {
 	try {
 		const raw = sessionStorage.getItem(LAST_ORDER_KEY)
 		if (!raw) return null
 		const parsed = orderSchema.safeParse(JSON.parse(raw))
-		return parsed.success && parsed.data.orderNumber === orderNumber ? parsed.data : null
+		return parsed.success && parsed.data.publicId === publicId ? parsed.data : null
 	} catch {
 		return null
 	}

@@ -42,15 +42,16 @@ export const API_URLS = {
 	ORDERS: {
 		BASE: `/orders`,
 		BY_ID: (id: string) => `/orders/${id}`,
-		// Публічний lookup для сторінки успіху (безпечні поля)
-		BY_NUMBER: (number: string) => `/orders/${number}`
+		// Публічний lookup для сторінки успіху (безпечні поля) — за непередбачуваним
+		// publicId (UUID), а не за послідовним orderNumber
+		BY_PUBLIC_ID: (publicId: string) => `/orders/${publicId}`
 	},
 	PAYMENT_REQUISITES: {
 		ACTIVE: `/payment-requisites/active`
 	},
 	PAYMENTS: {
 		MONOPAY_INVOICE: `/payments/monopay/invoice`,
-		MONOPAY_STATUS: (number: string) => `/payments/monopay/status/${number}`
+		MONOPAY_STATUS: (publicId: string) => `/payments/monopay/status/${publicId}`
 	},
 	LEADS: {
 		BASE: `/leads`,

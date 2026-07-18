@@ -25,28 +25,28 @@ import { FullScreenLoader } from '@/common/components'
 // Кеш стабілізує посилання, щоб getSnapshot не створював новий обʼєкт щорендера.
 const emptySubscribe = () => () => {}
 let stashCache: { key: string; value: Order | null } | undefined
-const getStash = (orderNumber: string): Order | null => {
-	if (!stashCache || stashCache.key !== orderNumber) {
-		stashCache = { key: orderNumber, value: readLastOrder(orderNumber) }
+const getStash = (publicId: string): Order | null => {
+	if (!stashCache || stashCache.key !== publicId) {
+		stashCache = { key: publicId, value: readLastOrder(publicId) }
 	}
 	return stashCache.value
 }
 
 export default function OrderSuccessPage() {
-	const params = useParams<{ number: string }>()
-	const orderNumber = decodeURIComponent(params.number)
+	const params = useParams<{ publicId: string }>()
+	const publicId = decodeURIComponent(params.publicId)
 
 	// Основне джерело — замовлення, збережене чекаутом у sessionStorage
 	const stashed = useSyncExternalStore(
 		emptySubscribe,
-		() => getStash(orderNumber),
+		() => getStash(publicId),
 		() => null
 	)
 
-	// Фолбек — публічний lookup безпечних полів
+	// Фолбек — публічний lookup безпечних полів (за непередбачуваним publicId)
 	const { data: fetched, isPending } = useQuery({
-		queryKey: ['order-summary', orderNumber],
-		queryFn: () => ordersApi.byNumber(orderNumber),
+		queryKey: ['order-summary', publicId],
+		queryFn: () => ordersApi.byPublicId(publicId),
 		enabled: stashed === null,
 		retry: false
 	})
@@ -56,8 +56,8 @@ export default function OrderSuccessPage() {
 
 	// Онлайн-оплата: поллимо статус (fallback до вебхука), поки не вийде з pending
 	const { data: payData } = useQuery({
-		queryKey: ['pay-status', orderNumber],
-		queryFn: () => paymentsApi.status(orderNumber),
+		queryKey: ['pay-status', publicId],
+		queryFn: () => paymentsApi.status(publicId),
 		enabled: isCard,
 		retry: false,
 		refetchInterval: q => {
@@ -72,7 +72,7 @@ export default function OrderSuccessPage() {
 	const handlePay = async () => {
 		setPaying(true)
 		try {
-			const { pageUrl } = await paymentsApi.createInvoice(orderNumber)
+			const { pageUrl } = await paymentsApi.createInvoice(publicId)
 			window.location.assign(pageUrl)
 		} catch {
 			// помилку показує тост http-сервісу; лишаємось на сторінці
@@ -88,8 +88,8 @@ export default function OrderSuccessPage() {
 				<PackageSearch className='text-muted-foreground mx-auto mb-4 h-12 w-12' />
 				<h1 className='font-display text-2xl font-medium'>Замовлення не знайдено</h1>
 				<p className='text-muted-foreground mt-2 text-sm'>
-					Не вдалося знайти замовлення №{orderNumber}. Якщо ви щойно його оформили —
-					напишіть нам, і ми допоможемо.
+					Не вдалося знайти замовлення за цим посиланням. Якщо ви щойно його
+					оформили — напишіть нам, і ми допоможемо.
 				</p>
 				<div className='mt-8 flex flex-wrap justify-center gap-3'>
 					<Ctas />
