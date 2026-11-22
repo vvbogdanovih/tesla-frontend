@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import { useReducedMotion } from '@/common/hooks/useReducedMotion'
 
@@ -32,23 +32,32 @@ const MASK_STYLE = {
 // монтується поверх лише на клієнті, лише на ≥768px і лише без
 // prefers-reduced-motion — інакше 2.6MB hero.mp4 вантажився навіть на мобайлі,
 // де відео сховане CSS.
+//
+// Щойно відео реально грає (onPlaying) — постер прибираємо з DOM: обидва шари
+// мають одну градієнтну маску, і в зоні її переходу відео напівпрозоре, тож
+// крізь нього просвічував статичний силует авто з постера («застиглий кадр»).
 export const HeroVideo = () => {
 	const desktop = useIsDesktop()
 	const reduced = useReducedMotion()
+	const [playing, setPlaying] = useState(false)
+
+	const showVideo = desktop && !reduced
 
 	return (
 		<>
-			<Image
-				src='/hero.jpg'
-				alt=''
-				aria-hidden
-				width={1600}
-				height={800}
-				priority
-				className={POSITION_CLASS}
-				style={MASK_STYLE}
-			/>
-			{desktop && !reduced && (
+			{!(showVideo && playing) && (
+				<Image
+					src='/hero.jpg'
+					alt=''
+					aria-hidden
+					width={1600}
+					height={800}
+					priority
+					className={POSITION_CLASS}
+					style={MASK_STYLE}
+				/>
+			)}
+			{showVideo && (
 				<video
 					aria-hidden
 					autoPlay
@@ -59,6 +68,7 @@ export const HeroVideo = () => {
 					poster='/hero.jpg'
 					className={POSITION_CLASS}
 					style={MASK_STYLE}
+					onPlaying={() => setPlaying(true)}
 				>
 					<source src='/hero.mp4' type='video/mp4' />
 				</video>
